@@ -19,6 +19,10 @@ A rede é composta por dois tipos principais de elementos:
    - Equipados com o sensor de temperatura e umidade DHT-11.
    - Envia informações de sensoriamento para o gateway.
 
+<p align="center">
+  <img width="200" src="images/BoardLoRa.png" alt="LoRa Logo">
+</p>
+
 ## Funcionalidades Principais
 
 - **Sensoriamento:**
