@@ -20,7 +20,7 @@ A rede é composta por dois tipos principais de elementos:
    - Envia informações de sensoriamento para o gateway.
 
 <p align="center">
-  <img width="200" src="images/HeltecEsp32LoRa.jpeg" alt="Board LoRa">
+  <img width="200" src="images/Heltec_Esp32_LoRa.png" alt="Board LoRa">
 </p>
 
 ## Funcionalidades Principais
