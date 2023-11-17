@@ -1,5 +1,7 @@
 # Projeto de Desenvolvimento de Rede IoT com LoRa
 
+![LoRa Logo](images/LoRa_Logo.png)
+
 Este repositório é dedicado ao desenvolvimento de uma rede IoT para sensoriamento, utilizando comunicação por radiofrequência LoRa (Long Range). O projeto envolve a implementação de um esquema estrela, no qual os elementos "gateway" e os "end-devices" colaboram para coletar dados de sensores e encaminhá-los para a plataforma Thingspeak.
 
 ## Arquitetura da Rede
