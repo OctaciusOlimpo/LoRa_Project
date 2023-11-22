@@ -1,6 +1,6 @@
 #include "main.h"
-#include "master.h"
-#include "slave.h"
+
+SSD1306 display(0x3c, 4, 15);
 
 void setupDisplay(){
   //O estado do GPIO16 é utilizado para controlar o display OLED

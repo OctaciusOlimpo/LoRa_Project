@@ -7,6 +7,9 @@
 #include <Wire.h>
 #include <SSD1306.h>
 
+#include "master.h"
+#include "slave.h"
+
 //Deixe esta linha descomentada para compilar o Master
 //Comente ou remova para compilar o Slave
 //#define MASTER
@@ -26,7 +29,8 @@ const String GETDATA[2] = {"ID0", "ID1"};
 const String SETDATA = "setdata=";
 
 //Variável para controlar o display
-SSD1306 display(0x3c, 4, 15);
+
+extern SSD1306 display;
 
 // Declare as funções utilizadas em main.cpp
 void setupDisplay();

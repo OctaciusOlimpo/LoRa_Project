@@ -5,5 +5,7 @@
 
 void setupMaster();
 void loopMaster();
+void send(int);
+void receive();
 
 #endif // MASTER_H
