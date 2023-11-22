@@ -48,7 +48,7 @@ A rede é composta por dois tipos principais de elementos:
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/kevincsouto/LoRa_Project.git
+   git clone https://github.com/OctaciusOlimpo/LoRa_Project.git
 
 2. Siga as instruções específicas para configurar e instalar o firmware nos end-devices e no gateway no diretório /src.
 3. Consulte a documentação no diretório /docs para obter informações detalhadas sobre a configuração e operação da rede.
