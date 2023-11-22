@@ -19,6 +19,10 @@ A rede é composta por dois tipos principais de elementos:
    - Equipados com o sensor de temperatura e umidade DHT-11.
    - Envia informações de sensoriamento para o gateway.
 
+<p align="center">
+  <img width="200" src="images/Heltec_Esp32_LoRa.png" alt="Board LoRa">
+</p>
+
 ## Funcionalidades Principais
 
 - **Sensoriamento:**
@@ -44,7 +48,7 @@ A rede é composta por dois tipos principais de elementos:
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/kevincsouto/LoRa_Project.git
+   git clone https://github.com/OctaciusOlimpo/LoRa_Project.git
 
 2. Siga as instruções específicas para configurar e instalar o firmware nos end-devices e no gateway no diretório /src.
 3. Consulte a documentação no diretório /docs para obter informações detalhadas sobre a configuração e operação da rede.
