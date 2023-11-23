@@ -17,6 +17,8 @@ void setupDisplay(){
   display.flipScreenVertically();
   display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
+
+  display.setBrightness(255);
 }
 
 //Configurações iniciais do LoRa

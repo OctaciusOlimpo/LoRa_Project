@@ -7,6 +7,8 @@
 long lastSendTime = 0;
 int id = 0;
 
+bool displayLineToggle = false;
+
 void setupMaster(){
   Serial.begin(115200);
   //Chama a configuração inicial do display
@@ -72,10 +74,23 @@ void receive(){
       //e o Master receber e ler
       String waiting = String(millis() - lastSendTime);
       //Mostra no display os dados e o tempo que a operação demorou
-      display.clear();
-      display.drawString(0, 0, "Recebeu: " + data);
-      display.drawString(0, 10, "Tempo: " + waiting + "ms");
+      //display.clear();
+      
+      if(displayLineToggle)
+      {
+        display.clear();
+        display.drawString(0, 0, "Recebeu: " + data);
+      }
+      else
+      {
+        display.drawString(0, 10, "Recebeu: " + data);
+      }
+      
+      //                 C  L
+      display.drawString(0, 20, "Tempo: " + waiting + "ms");
       display.display();
+    
+    displayLineToggle = !displayLineToggle;
     }
   }
 }
