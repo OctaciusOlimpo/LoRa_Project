@@ -6,6 +6,8 @@
 #include <LoRa.h>
 #include <Wire.h>
 #include <SSD1306.h>
+#include <DHTesp.h> // Click here to get the library: http://librarymanager/All#DHTesp
+#include <Ticker.h>
 
 #include "master.h"
 #include "slave.h"

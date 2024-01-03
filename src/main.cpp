@@ -14,11 +14,12 @@ void setupDisplay(){
 
   //Configurações do display
   display.init();
+  //display.setContrast(255, 241, 64);
   display.flipScreenVertically();
   display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
 
-  display.setBrightness(255);
+  //display.setBrightness(255);
 }
 
 //Configurações iniciais do LoRa

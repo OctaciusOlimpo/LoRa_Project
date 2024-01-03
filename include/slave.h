@@ -5,6 +5,6 @@
 
 void setupSlave();
 void loopSlave();
-String readData();
+void readData();
 
 #endif // SLAVE_H

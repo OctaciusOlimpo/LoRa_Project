@@ -9,6 +9,13 @@ int id = 0;
 
 bool displayLineToggle = false;
 
+String apiKey = "";
+const char *ssid = "";
+const char *password = "";
+const char *server = "api.thingspeak.com";
+
+WiFiClient client;
+
 void setupMaster(){
   Serial.begin(115200);
   //Chama a configuração inicial do display
@@ -19,6 +26,22 @@ void setupMaster(){
   display.clear();
   display.drawString(0, 0, "Master");
   display.display();
+
+  //Conexão Wifi
+  Serial.print("[master] Connectiong to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while(WiFi.status() != WL_CONNECTED)
+  {
+    delay(2000);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("[master] WiFi connected.");
+  Serial.println("[master] IP address: ");
+  Serial.println(WiFi.localIP());
+  //Fim conexão Wifi
 }
 
 void loopMaster(){
@@ -76,6 +99,15 @@ void receive(){
       //Mostra no display os dados e o tempo que a operação demorou
       //display.clear();
       
+      int pos1 = data.indexOf('/');   
+      int pos2 = data.indexOf('&');
+
+      String readingID = data.substring(0, pos1);
+      String temperatureRef = data.substring(pos1 + 1, pos2);
+      String humidityRef = data.substring(pos2 + 1, data.length());
+
+      sendToAPI(readingID, temperatureRef, humidityRef);
+
       if(displayLineToggle)
       {
         display.clear();
@@ -90,8 +122,44 @@ void receive(){
       display.drawString(0, 20, "Tempo: " + waiting + "ms");
       display.display();
     
-    displayLineToggle = !displayLineToggle;
+      displayLineToggle = !displayLineToggle;
     }
   }
 }
 
+void sendToAPI(String readingID, String temperatureAP, String humidityAP)
+{
+  if (client.connect(server, 80)) // "184.106.153.149" or api.thingspeak.com
+      {
+          String postStr = apiKey;
+          if(readingID == "ID0")
+          {
+            postStr += "&field1=";
+            postStr += String(temperatureAP);
+            postStr += "&field2=";
+            postStr += String(humidityAP);
+          }
+          if(readingID == "ID1")
+          {
+            postStr += "&field3=";
+            postStr += String(temperatureAP);
+            postStr += "&field4=";
+            postStr += String(humidityAP);
+          }
+        /*    
+          postStr += "&field4=";
+          postStr += String(rssi);
+          postStr += "\r\n\r\n\r\n\r\n";
+        */
+          client.print("POST /update HTTP/1.1\n");
+          client.print("Host: api.thingspeak.com\n");
+          client.print("Connection: close\n");
+          client.print("X-THINGSPEAKAPIKEY: " + apiKey + "\n");
+          client.print("Content-Type: application/x-www-form-urlencoded\n");
+          client.print("Content-Length: ");
+          client.print(postStr.length());
+          client.print("\n\n");
+          client.print(postStr);
+    
+        }    
+}

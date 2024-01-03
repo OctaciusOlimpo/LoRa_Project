@@ -130,6 +130,8 @@
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/spi_flash/include/esp_spi_flash.h \
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/spi_flash/include/esp_spi_flash_counters.h \
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_hw_support/include/soc/esp32/spiram.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/io_pin_remap.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h \
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src/SPI.h \
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-spi.h \
  .pio/libdeps/heltec_wifi_lora_32_V2/LoRa/src/LoRa.h \
@@ -139,4 +141,66 @@
  .pio/libdeps/heltec_wifi_lora_32_V2/ESP8266\ and\ ESP32\ OLED\ driver\ for\ SSD1306\ displays/src/SSD1306Wire.h \
  .pio/libdeps/heltec_wifi_lora_32_V2/ESP8266\ and\ ESP32\ OLED\ driver\ for\ SSD1306\ displays/src/OLEDDisplay.h \
  .pio/libdeps/heltec_wifi_lora_32_V2/ESP8266\ and\ ESP32\ OLED\ driver\ for\ SSD1306\ displays/src/OLEDDisplayFonts.h \
- include/master.h include/slave.h
+ .pio/libdeps/heltec_wifi_lora_32_V2/DHT\ sensor\ library\ for\ ESPx/DHTesp.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/Ticker/src/Ticker.h \
+ include/master.h include/slave.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFi.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/Print.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/IPv6Address.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiType.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_wifi/include/esp_wifi_types.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_wifi/include/esp_private/esp_wifi_types_private.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_hw_support/include/esp_interface.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_event/include/esp_event_base.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiSTA.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiGeneric.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_event/include/esp_event.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_event/include/esp_event_base.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_event/include/esp_event_legacy.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_netif/include/esp_netif.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_netif/include/esp_netif_ip_addr.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_netif/include/esp_netif_types.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_netif/include/esp_netif_defaults.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_eth/include/esp_eth_netif_glue.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_eth/include/esp_eth.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_eth/include/esp_eth_com.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/hal/include/hal/eth_types.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_eth/include/esp_eth_mac.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_eth/include/esp_eth_phy.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/tcpip_adapter/include/tcpip_adapter.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/tcpip_adapter/include/tcpip_adapter_types.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip_addr.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/opt.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/port/esp32/include/lwipopts.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include/sys/ioctl.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_system/include/esp_task.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include/esp_additions/freertos/FreeRTOSConfig.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/port/esp32/include/netif/dhcp_state.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/port/esp32/include/sntp/sntp_get_set_time.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/debug.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/arch.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/port/esp32/include/arch/cc.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/port/esp32/include/arch/sys_arch.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/port/esp32/include/arch/vfs_lwip.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/def.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip4_addr.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip6_addr.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/def.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip6_zone.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/include/apps/dhcpserver/dhcpserver.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/err.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_netif/include/esp_netif_sta_list.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_wifi/include/esp_smartconfig.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/wifi_provisioning/include/wifi_provisioning/manager.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/protocomm/include/common/protocomm.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/protocomm/include/security/protocomm_security.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/wifi_provisioning/include/wifi_provisioning/wifi_config.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiAP.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiScan.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiClient.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/Client.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiServer.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/Server.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiUdp.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/Udp.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/cbuf.h

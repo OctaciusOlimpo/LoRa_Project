@@ -100,4 +100,5 @@
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-bt.h \
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-psram.h \
  C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-rgb-led.h \
- C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-cpu.h
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-cpu.h \
+ C:/Users/GreenV.LAPTOP-81U2B1LR.000/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/soc/esp32/include/soc/gpio_pins.h
