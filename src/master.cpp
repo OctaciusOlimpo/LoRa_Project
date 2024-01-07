@@ -1,7 +1,7 @@
 #include "master.h"
 
 //Intervalo entre os envios
-#define INTERVAL 1000
+#define INTERVAL 2000
 
 //Tempo do último envio
 long lastSendTime = 0;
@@ -9,9 +9,9 @@ int id = 0;
 
 bool displayLineToggle = false;
 
-String apiKey = "";
-const char *ssid = "";
-const char *password = "";
+String apiKey = "YF3V4U4D4C5CLVDR";
+const char *ssid = "Rorschach";
+const char *password = "espectral";
 const char *server = "api.thingspeak.com";
 
 WiFiClient client;
@@ -28,7 +28,7 @@ void setupMaster(){
   display.display();
 
   //Conexão Wifi
-  Serial.print("[master] Connectiong to ");
+  Serial.print("[master] Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
   while(WiFi.status() != WL_CONNECTED)
@@ -39,8 +39,7 @@ void setupMaster(){
 
   Serial.println("");
   Serial.println("[master] WiFi connected.");
-  Serial.println("[master] IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.print("[master] IP address: "); Serial.println(WiFi.localIP());
   //Fim conexão Wifi
 }
 
@@ -134,17 +133,26 @@ void sendToAPI(String readingID, String temperatureAP, String humidityAP)
           String postStr = apiKey;
           if(readingID == "ID0")
           {
+      
+            Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
+            Serial.println(); 
+
             postStr += "&field1=";
             postStr += String(temperatureAP);
             postStr += "&field2=";
             postStr += String(humidityAP);
           }
-          if(readingID == "ID1")
+          else if(readingID == "ID1")
           {
+      
+            Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
+            Serial.println(); 
+
             postStr += "&field3=";
             postStr += String(temperatureAP);
             postStr += "&field4=";
             postStr += String(humidityAP);
+            postStr += "\r\n\r\n\r\n\r\n";
           }
         /*    
           postStr += "&field4=";

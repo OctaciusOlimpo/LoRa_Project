@@ -18,7 +18,7 @@ void setupSlave(){
     display.drawString(0, 0, "Slave esperando...");
     display.display();
 
-    dht.setup(0, DHTesp::DHT22); // Connect DHT sensor to GPIO 17
+    dht.setup(0, DHTesp::DHT11); // Connect DHT sensor to GPIO 17
 }
 
 void loopSlave(){
@@ -26,7 +26,7 @@ void loopSlave(){
   int packetSize = LoRa.parsePacket();
 
   //Verifica se o pacote possui a quantidade de caracteres que esperamos
-  if (packetSize == GETDATA[1].length()){
+  if (packetSize == GETDATA[0].length()){
     String received = "";
 
     //Armazena os dados do pacote em uma string
@@ -34,10 +34,10 @@ void loopSlave(){
       received += (char) LoRa.read();
     }
 
-    if(received == "ID1"){
+    if(received == "ID0"){
       //Simula a leitura dos dados
       readData();
-      String data = String(GETDATA[1]) + "/" + temperature + "&" + humidity;
+      String data = String(GETDATA[0]) + "/" + temperature + "&" + humidity;
       Serial.println("Criando pacote para envio");
       //Cria o pacote para envio
       LoRa.beginPacket();
