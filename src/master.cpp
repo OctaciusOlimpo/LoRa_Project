@@ -16,8 +16,8 @@ const char *server = "api.thingspeak.com";
 
 WiFiClient client;
 
-void setupMaster(){
-  Serial.begin(115200);
+void setupMaster()
+{
   //Chama a configuração inicial do display
   setupDisplay();
   //Chama a configuração inicial do LoRa

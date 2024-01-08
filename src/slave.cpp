@@ -9,7 +9,6 @@ String temperature = "";
 DHTesp dht;
 
 void setupSlave(){
-    Serial.begin(115200);
     //Chama a configuração inicial do display
     setupDisplay();
     //Chama a configuração inicial do LoRa

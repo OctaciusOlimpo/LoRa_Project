@@ -9,6 +9,7 @@
 #include <DHTesp.h> // Click here to get the library: http://librarymanager/All#DHTesp
 #include <Ticker.h>
 
+#include "webServer.h"
 #include "master.h"
 #include "slave.h"
 
