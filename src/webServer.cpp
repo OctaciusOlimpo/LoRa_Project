@@ -162,18 +162,32 @@ void setupAPSlave()
     WiFi.softAP(currentIDNode, password);
 }
 
-std::vector<String> scanAndCreateNodeIDs() {
+std::vector<String> scanAndCreateNodeIDs() 
+{
   std::vector<String> nodeIDs;
 
   // Realiza a varredura das redes Wi-Fi disponíveis
   int networkCount = WiFi.scanNetworks();
-  for (int i = 0; i < networkCount; i++) {
+  for (int i = 0; i < networkCount; i++) 
+  {
     String ssid = WiFi.SSID(i);
 
-    // Verifica se o SSID está no formato "NODE" seguido por um número
-    if (ssid.startsWith("NODE")) {
-      // Extrai o número do SSID e cria o ID correspondente
-      int nodeNumber = ssid.substring(4).toInt();
+    // Verifica se o SSID está no formato "NODE" seguido ou não por um número
+    if (ssid.startsWith("NODE")) 
+    {
+      int nodeNumber;
+
+      // Verifica se o SSID é exatamente "NODE"
+      if (ssid == "NODE") 
+      {
+        nodeNumber = 0;  // Atribui 0 se for apenas "NODE"
+      } 
+      else 
+      {
+        // Extrai o número do SSID para outros casos (ex: NODE1, NODE2, etc.)
+        nodeNumber = ssid.substring(4).toInt();
+      }
+
       String nodeID = "ID" + String(nodeNumber);
 
       // Adiciona o ID ao vetor
