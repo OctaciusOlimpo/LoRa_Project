@@ -6,6 +6,11 @@ int count = 0;
 String humidity = "";
 String temperature = "";
 
+const int NUM_SAMPLES = 10;
+float humiditySamples[NUM_SAMPLES];
+float temperatureSamples[NUM_SAMPLES];
+int sampleIndex = 0;
+
 DHTesp dht;
 
 void setupSlave(){
@@ -25,15 +30,18 @@ void loopSlave(){
   int packetSize = LoRa.parsePacket();
 
   //Verifica se o pacote possui a quantidade de caracteres que esperamos
-  if (packetSize == GETDATA[0].length()){
+  if (packetSize == GETDATA[0].length())
+  {
     String received = "";
 
     //Armazena os dados do pacote em uma string
-    while(LoRa.available()){
+    while(LoRa.available())
+    {
       received += (char) LoRa.read();
     }
 
-    if(received == "ID0"){
+    if(received == "ID0")
+    {
       //Simula a leitura dos dados
       readData();
       String data = String(GETDATA[0]) + "/" + temperature + "&" + humidity;
@@ -55,10 +63,32 @@ void loopSlave(){
 //Poderia ser o valor lido por algum sensor por exemplo
 //Aqui vamos enviar apenas um contador para testes
 //mas você pode alterar a função para fazer a leitura de algum sensor
-void readData(){
+void readData()
+{
+  // Realiza a leitura dos dados do sensor DHT11
   delay(dht.getMinimumSamplingPeriod());
+  float currentHumidity = dht.getHumidity();
+  float currentTemperature = dht.getTemperature();
 
-  humidity = (String)dht.getHumidity();
-  temperature = (String)dht.getTemperature();
+  // Atualiza os arrays de amostras
+  humiditySamples[sampleIndex] = currentHumidity;
+  temperatureSamples[sampleIndex] = currentTemperature;
+
+  // Avança para o próximo índice de amostra circular
+  sampleIndex = (sampleIndex + 1) % NUM_SAMPLES;
+
+  // Calcula a média móvel
+  float averageHumidity = 0;
+  float averageTemperature = 0;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    averageHumidity += humiditySamples[i];
+    averageTemperature += temperatureSamples[i];
+  }
+  averageHumidity /= NUM_SAMPLES;
+  averageTemperature /= NUM_SAMPLES;
+
+  // Atualiza as variáveis globais (pode ser modificado conforme sua necessidade)
+  humidity = String(averageHumidity);
+  temperature = String(averageTemperature);
 }
 

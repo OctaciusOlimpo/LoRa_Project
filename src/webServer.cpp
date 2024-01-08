@@ -23,6 +23,7 @@ String currentURL = "api.thingspeak.com";
 String currentAPIKey = "YF3V4U4D4C5CLVDR";
 
 AsyncWebServer server (80);
+WiFiClient client;
 
 void setupWebServer()
 {

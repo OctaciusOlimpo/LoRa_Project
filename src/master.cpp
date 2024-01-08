@@ -9,13 +9,6 @@ int id = 0;
 
 bool displayLineToggle = false;
 
-String apiKey = "YF3V4U4D4C5CLVDR";
-const char *ssid = "Rorschach";
-const char *password = "espectral";
-const char *server = "api.thingspeak.com";
-
-WiFiClient client;
-
 void setupMaster()
 {
   //Chama a configuração inicial do display
@@ -29,8 +22,8 @@ void setupMaster()
 
   //Conexão Wifi
   Serial.print("[master] Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
+  Serial.println(currentSSID);
+  WiFi.begin(currentSSID, currentAPIKey);
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(2000);
@@ -128,9 +121,12 @@ void receive(){
 
 void sendToAPI(String readingID, String temperatureAP, String humidityAP)
 {
-  if (client.connect(server, 80)) // "184.106.153.149" or api.thingspeak.com
+  // Converta a String para const char*
+  const char* host = currentURL.c_str();
+
+  if (client.connect(host, 80)) // "184.106.153.149" or api.thingspeak.com
       {
-          String postStr = apiKey;
+          String postStr = currentAPIKey;
           if(readingID == "ID0")
           {
       
@@ -162,7 +158,7 @@ void sendToAPI(String readingID, String temperatureAP, String humidityAP)
           client.print("POST /update HTTP/1.1\n");
           client.print("Host: api.thingspeak.com\n");
           client.print("Connection: close\n");
-          client.print("X-THINGSPEAKAPIKEY: " + apiKey + "\n");
+          client.print("X-THINGSPEAKAPIKEY: " + currentAPIKey + "\n");
           client.print("Content-Type: application/x-www-form-urlencoded\n");
           client.print("Content-Length: ");
           client.print(postStr.length());

@@ -2,7 +2,6 @@
 #define MASTER_H
 
 #include "main.h"
-#include <WiFi.h>
 
 void setupMaster();
 void loopMaster();

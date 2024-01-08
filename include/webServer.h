@@ -17,4 +17,7 @@ void setupWebServer();
 void setupAPMaster();
 void setupAPSlave();
 
+extern WiFiClient client;
+extern AsyncWebServer server;
+
 std::vector<String> scanAndCreateNodeIDs();
