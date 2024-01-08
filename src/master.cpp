@@ -23,7 +23,7 @@ void setupMaster()
   //Conexão Wifi
   Serial.print("[master] Connecting to ");
   Serial.println(currentSSID);
-  WiFi.begin(currentSSID, currentAPIKey);
+  WiFi.begin(currentSSID, currentPassword);
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(2000);

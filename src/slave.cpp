@@ -22,7 +22,14 @@ void setupSlave(){
     display.drawString(0, 0, "Slave esperando...");
     display.display();
 
-    dht.setup(0, DHTesp::DHT11); // Connect DHT sensor to GPIO 17
+    dht.setup(0, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
+
+    // Inicializa os arrays com um valor que representa uma amostra não coletada
+  for (int i = 0; i < NUM_SAMPLES; i++) 
+  {
+    humiditySamples[i] = -1;
+    temperatureSamples[i] = -1;
+  }
 }
 
 void loopSlave(){
@@ -30,7 +37,7 @@ void loopSlave(){
   int packetSize = LoRa.parsePacket();
 
   //Verifica se o pacote possui a quantidade de caracteres que esperamos
-  if (packetSize == GETDATA[0].length())
+  if (packetSize == GETDATA[1].length())
   {
     String received = "";
 
@@ -40,11 +47,11 @@ void loopSlave(){
       received += (char) LoRa.read();
     }
 
-    if(received == "ID0")
+    if(received == "ID1")
     {
       //Simula a leitura dos dados
       readData();
-      String data = String(GETDATA[0]) + "/" + temperature + "&" + humidity;
+      String data = String(GETDATA[1]) + "/" + temperature + "&" + humidity;
       Serial.println("Criando pacote para envio");
       //Cria o pacote para envio
       LoRa.beginPacket();
@@ -63,7 +70,7 @@ void loopSlave(){
 //Poderia ser o valor lido por algum sensor por exemplo
 //Aqui vamos enviar apenas um contador para testes
 //mas você pode alterar a função para fazer a leitura de algum sensor
-void readData()
+void readData() 
 {
   // Realiza a leitura dos dados do sensor DHT11
   delay(dht.getMinimumSamplingPeriod());
@@ -80,12 +87,24 @@ void readData()
   // Calcula a média móvel
   float averageHumidity = 0;
   float averageTemperature = 0;
-  for (int i = 0; i < NUM_SAMPLES; i++) {
-    averageHumidity += humiditySamples[i];
-    averageTemperature += temperatureSamples[i];
+  int count = 0;
+
+  for (int i = 0; i < NUM_SAMPLES; i++) 
+  {
+    // Soma apenas as amostras válidas
+    if (humiditySamples[i] != -1) 
+    {  // Supondo que -1 seja um valor de inicialização para indicar uma amostra não válida
+      averageHumidity += humiditySamples[i];
+      averageTemperature += temperatureSamples[i];
+      count++;
+    }
   }
-  averageHumidity /= NUM_SAMPLES;
-  averageTemperature /= NUM_SAMPLES;
+
+  if (count > 0) 
+  {  // Evita divisão por zero
+    averageHumidity /= count;
+    averageTemperature /= count;
+  }
 
   // Atualiza as variáveis globais (pode ser modificado conforme sua necessidade)
   humidity = String(averageHumidity);
