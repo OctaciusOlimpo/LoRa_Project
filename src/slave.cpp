@@ -46,11 +46,13 @@ void loopSlave()
       received += (char) LoRa.read();
     }
 
-    if(std::find(nodeIDs.begin(), nodeIDs.end(), received) != nodeIDs.end())
+    Serial.print("[slave] "); Serial.println(received);
+
+    if(received == nodeID)
     {
       //Simula a leitura dos dados
       readData();
-      String data = received + "/" + temperature + "&" + humidity;
+      String data = nodeID + "/" + temperature + "&" + humidity;
       Serial.println("[slave] Criando pacote para envio");
       //Cria o pacote para envio
       LoRa.beginPacket();

@@ -8,6 +8,9 @@
 #include <SSD1306.h>
 #include <DHTesp.h> // Click here to get the library: http://librarymanager/All#DHTesp
 #include <Ticker.h>
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <Preferences.h>
 
 #include "webServer.h"
 #include "master.h"
@@ -15,7 +18,7 @@
 
 //Deixe esta linha descomentada para compilar o Master
 //Comente ou remova para compilar o Slave
-//#define MASTER
+#define MASTER
 
 #define SCK 5   // GPIO5  SCK
 #define MISO 19 // GPIO19 MISO
@@ -25,6 +28,8 @@
 #define DI00 26 // GPIO26 IRQ(Interrupt Request)
 
 #define BAND 915E6 //Frequência do radio - exemplo : 433E6, 868E6, 915E6
+
+extern std::vector<String> nodeIDs; 
 
 //Constante que o Slave retorna junto com os dados para o Master
 const String SETDATA = "setdata=";

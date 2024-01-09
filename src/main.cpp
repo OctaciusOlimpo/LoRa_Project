@@ -53,11 +53,11 @@ void setup()
 
   #ifdef MASTER
     // Configuração inicial do Master
-    setupAPMaster();
+    setupWebServer();
     setupMaster();
   #else
     // Configuração inicial do Slave
-    setupAPSlave();
+    setupWebServer();
     setupSlave();
   #endif
 }

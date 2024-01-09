@@ -24,6 +24,11 @@ String currentIDNode = String(IDNODE);
 String currentURL = "api.thingspeak.com";
 String currentAPIKey = "YF3V4U4D4C5CLVDR";
 
+String nodeID;
+int numNodes;
+
+std::vector<String> nodeIDs;
+
 AsyncWebServer server (80);
 WiFiClient client;
 
@@ -36,10 +41,19 @@ void setupWebServer()
         // Configuração inicial do Slave
         setupAPSlave();
     #endif
-    // Change SSID if there's another a GREENV-AP in the same local
-
+    
     // Chama a função uma vez no início para obter os IDs dos nodes
     nodeIDs = scanAndCreateNodeIDs();
+
+    numNodes = nodeIDs.size();
+    while (numNodes == 0) 
+    {
+        Serial.println("[webServer] Looking for nodes!");
+
+        delay(1000); // Espera um segundo antes de tentar novamente
+        nodeIDs = scanAndCreateNodeIDs();
+        numNodes = nodeIDs.size(); // Tentativa de reescanear
+    }
 }
 
 void setupAPMaster()
@@ -47,29 +61,27 @@ void setupAPMaster()
     Serial.println("[webServer] Configuring AP Mode (Access Point)...");
     WiFi.softAP(ssid, password);
 
+    /*
     preferences.begin("configuracoes", false);
 
-    if(!preferences.getString("ssid", "").isEmpty()) 
-    {
-        currentSSID = preferences.getString("ssid", "");
-    }
-    if(!preferences.getString("password", "").isEmpty()) 
-    {
-        currentPassword = preferences.getString("password", "");
-    }
-    if(!preferences.getString("IDNode", "").isEmpty()) 
-    {
-        currentIDNode = preferences.getString("IDNode", "");
-    }
-    if(!preferences.getString("APIKey", "").isEmpty()) 
-    {
-        currentAPIKey = preferences.getString("APIKey", "");
-    }
-    if(!preferences.getString("url", "").isEmpty()) 
-    {
-        currentURL = preferences.getString("url", "");
-    }
+        if(!preferences.getString("ssid", "").isEmpty()) 
+        {
+            currentSSID = preferences.getString("ssid", "");
+        }
+        if(!preferences.getString("password", "").isEmpty()) 
+        {
+            currentPassword = preferences.getString("password", "");
+        }
+        if(!preferences.getString("url", "").isEmpty()) 
+        {
+            currentURL = preferences.getString("url", "");
+        }
+        if(!preferences.getString("APIKey", "").isEmpty()) 
+        {
+            currentAPIKey = preferences.getString("APIkey", "");
+        }
     preferences.end();
+    */
     
     Serial.println("[webServer] Starting the server...");
     server.begin();
@@ -189,7 +201,7 @@ std::vector<String> scanAndCreateNodeIDs()
         nodeNumber = ssid.substring(4).toInt();
       }
 
-      String nodeID = "ID" + String(nodeNumber);
+      nodeID = "ID" + String(nodeNumber);
 
       // Adiciona o ID ao vetor
       nodeIDs.push_back(nodeID);

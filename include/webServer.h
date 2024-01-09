@@ -1,9 +1,6 @@
 #pragma once
 
-#include <Arduino.h>
-#include <WiFi.h>
-#include <ESPAsyncWebServer.h>
-#include <Preferences.h>
+#include "main.h"
 
 extern String currentSSID;
 extern String currentPassword;
@@ -11,9 +8,10 @@ extern String currentURL;
 extern String currentIDNode;
 extern String currentAPIKey;
 
-extern int nodeNumber;
+extern String nodeID;
+extern int numNodes;
 
-extern std::vector<String> nodeIDs; 
+extern int nodeNumber;
 
 void setupWebServer();
 void setupAPMaster();
