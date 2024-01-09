@@ -13,12 +13,14 @@ int sampleIndex = 0;
 
 DHTesp dht;
 
-void setupSlave(){
+void setupSlave()
+{
     //Chama a configuração inicial do display
     setupDisplay();
     //Chama a configuração inicial do LoRa
     setupLoRa();
     display.clear();
+    Serial.println("[slave] Slave esperando...");
     display.drawString(0, 0, "Slave esperando...");
     display.display();
 
@@ -32,7 +34,8 @@ void setupSlave(){
   }
 }
 
-void loopSlave(){
+void loopSlave()
+{
   //Tenta ler o pacote
   int packetSize = LoRa.parsePacket();
 
@@ -52,7 +55,7 @@ void loopSlave(){
       //Simula a leitura dos dados
       readData();
       String data = String(GETDATA[1]) + "/" + temperature + "&" + humidity;
-      Serial.println("Criando pacote para envio");
+      Serial.println("[slave] Criando pacote para envio");
       //Cria o pacote para envio
       LoRa.beginPacket();
       LoRa.print(SETDATA + data);
@@ -60,6 +63,7 @@ void loopSlave(){
       LoRa.endPacket();
       //Mostra no display
       display.clear();
+      Serial.println("[slave] Enviou: " + String(data));
       display.drawString(0, 0, "Enviou: " + String(data));
       display.display();
     }

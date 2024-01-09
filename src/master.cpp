@@ -6,6 +6,7 @@
 //Tempo do último envio
 long lastSendTime = 0;
 int id = 0;
+const int numSlaves = 2;
 
 bool displayLineToggle = false;
 
@@ -36,29 +37,26 @@ void setupMaster()
   //Fim conexão Wifi
 }
 
-void loopMaster(){
+void loopMaster()
+{
   //Se passou o tempo definido em INTERVAL desde o último envio
-  if (millis() - lastSendTime > INTERVAL){
+  if (millis() - lastSendTime > INTERVAL)
+  {
     //Marcamos o tempo que ocorreu o último envio
     lastSendTime = millis();
     //Envia o pacote para informar ao Slave que queremos receber os dados
     send(id);
 
-    if(id == 0)
-    {
-      id++;
-    }
-    else
-    {
-      id = 0;
-    }
+     // Mova para o próximo escravo usando circular
+    id = (id + 1) % numSlaves;
   }
 
   //Verificamos se há pacotes para recebermos
   receive();
 }
 
-void send(int id){
+void send(int id)
+{
   //Inicializa o pacote
   LoRa.beginPacket();
   //Envia o que está contido em "GETDATA"
@@ -67,7 +65,8 @@ void send(int id){
   LoRa.endPacket();
 }
 
-void receive(){
+void receive()
+{
   //Tentamos ler o pacote
   int packetSize = LoRa.parsePacket();
   
