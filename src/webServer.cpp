@@ -6,6 +6,8 @@ const char *ssid = "GATEWAY-AP";
 const char *password = "password";
 const int serverPort = 80;
 
+int nodeNumber;
+
 #ifndef IDNODE
 #define IDNODE "NODE" // Default value if not specified in build flags
 #endif
@@ -35,12 +37,13 @@ void setupWebServer()
         setupAPSlave();
     #endif
     // Change SSID if there's another a GREENV-AP in the same local
+
+    // Chama a função uma vez no início para obter os IDs dos nodes
+    nodeIDs = scanAndCreateNodeIDs();
 }
 
 void setupAPMaster()
 {
-    std::vector<String> nodeIDs = scanAndCreateNodeIDs();
-
     Serial.println("[webServer] Configuring AP Mode (Access Point)...");
     WiFi.softAP(ssid, password);
 
@@ -78,19 +81,20 @@ void setupAPMaster()
     Serial.println("/");
     
     Serial.println("[webServer] Configuring routes on the web server...");
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) 
+    {
         // Modificação do cabeçalho HTML
         String html = "<html><head><title>Gateway Configuration</title>";
         html += "<style>";
-        html += "body { font-size: 140%; text-align: center; background-color: #f0f8ff; color: #008000; }";
+        html += "body { font-size: 140%; text-align: center; background-color: #f0f0ff; color: #800080; }";
         html += "form { text-align: left; max-width: 400px; margin: 0 auto; }";
         html += "label { display: block; margin-bottom: 10px; }";
         html += "input { width: 100%; box-sizing: border-box; padding: 5px; margin-bottom: 15px; }";
         html += "input[type='checkbox'] { width: auto; margin-left: 5px; }";
-        html += "input[type='submit'] { background-color: #008000; color: #fff; padding: 8px 15px; border: none; cursor: pointer; }";
+        html += "input[type='submit'] { background-color: #800080; color: #fff; padding: 8px 15px; border: none; cursor: pointer; }";
         html += "</style>";
         html += "</head><body>";
-        html += "<h1 style='color: #008000;'>Gateway Configuration Settings</h1>";
+        html += "<h1 style='color: #800080;'>Gateway Configuration Settings</h1>";
         html += "<form action='/config' method='POST'>";
         html += "<label for='ssid'>Network name:</label> <input type='text' name='ssid'><br>";
         html += "Empty password? <input type='checkbox' name='noPassword'><br>";
@@ -103,6 +107,7 @@ void setupAPMaster()
 
         request->send(200, "text/html", html);
     });
+
 
     server.on("/config", HTTP_POST, [](AsyncWebServerRequest *request) 
     {
@@ -144,8 +149,6 @@ void setupAPMaster()
 
 void setupAPSlave()
 {
-    std::vector<String> nodeIDs = scanAndCreateNodeIDs();
-
     int apCount = WiFi.scanNetworks();
     int suffix = 1;
 
@@ -175,8 +178,6 @@ std::vector<String> scanAndCreateNodeIDs()
     // Verifica se o SSID está no formato "NODE" seguido ou não por um número
     if (ssid.startsWith("NODE")) 
     {
-      int nodeNumber;
-
       // Verifica se o SSID é exatamente "NODE"
       if (ssid == "NODE") 
       {

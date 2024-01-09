@@ -1,8 +1,5 @@
 #include "slave.h"
 
-//Contador que irá servir como o dados que o Slave irá enviar
-int count = 0;
-
 String humidity = "";
 String temperature = "";
 
@@ -15,18 +12,18 @@ DHTesp dht;
 
 void setupSlave()
 {
-    //Chama a configuração inicial do display
-    setupDisplay();
-    //Chama a configuração inicial do LoRa
-    setupLoRa();
-    display.clear();
-    Serial.println("[slave] Slave esperando...");
-    display.drawString(0, 0, "Slave esperando...");
-    display.display();
+  //Chama a configuração inicial do display
+  setupDisplay();
+  //Chama a configuração inicial do LoRa
+  setupLoRa();
+  display.clear();
+  Serial.println("[slave] Slave esperando...");
+  display.drawString(0, 0, "Slave esperando...");
+  display.display();
 
-    dht.setup(0, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
+  dht.setup(0, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
 
-    // Inicializa os arrays com um valor que representa uma amostra não coletada
+  // Inicializa os arrays com um valor que representa uma amostra não coletada
   for (int i = 0; i < NUM_SAMPLES; i++) 
   {
     humiditySamples[i] = -1;
@@ -38,9 +35,8 @@ void loopSlave()
 {
   //Tenta ler o pacote
   int packetSize = LoRa.parsePacket();
-
   //Verifica se o pacote possui a quantidade de caracteres que esperamos
-  if (packetSize == GETDATA[1].length())
+  if (packetSize > 0)
   {
     String received = "";
 
@@ -50,11 +46,11 @@ void loopSlave()
       received += (char) LoRa.read();
     }
 
-    if(received == "ID1")
+    if(std::find(nodeIDs.begin(), nodeIDs.end(), received) != nodeIDs.end())
     {
       //Simula a leitura dos dados
       readData();
-      String data = String(GETDATA[1]) + "/" + temperature + "&" + humidity;
+      String data = received + "/" + temperature + "&" + humidity;
       Serial.println("[slave] Criando pacote para envio");
       //Cria o pacote para envio
       LoRa.beginPacket();

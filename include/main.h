@@ -24,10 +24,8 @@
 #define RST 14  // GPIO14 RESET
 #define DI00 26 // GPIO26 IRQ(Interrupt Request)
 
-#define BAND 433E6 //Frequência do radio - exemplo : 433E6, 868E6, 915E6
+#define BAND 915E6 //Frequência do radio - exemplo : 433E6, 868E6, 915E6
 
-//Constante para informar ao Slave que queremos os dados
-const String GETDATA[2] = {"ID0", "ID1"};
 //Constante que o Slave retorna junto com os dados para o Master
 const String SETDATA = "setdata=";
 

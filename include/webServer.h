@@ -11,6 +11,8 @@ extern String currentURL;
 extern String currentIDNode;
 extern String currentAPIKey;
 
+extern int nodeNumber;
+
 extern std::vector<String> nodeIDs; 
 
 void setupWebServer();

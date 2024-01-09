@@ -2,13 +2,14 @@
 
 //Intervalo entre os envios
 #define INTERVAL 2000
+#define MAX_DISPLAY_LINES 4
 
 //Tempo do último envio
 long lastSendTime = 0;
 int id = 0;
-const int numSlaves = 2;
+int numSlaves = 1;
 
-bool displayLineToggle = false;
+int idDisplay;
 
 void setupMaster()
 {
@@ -35,6 +36,11 @@ void setupMaster()
   Serial.println("[master] WiFi connected.");
   Serial.print("[master] IP address: "); Serial.println(WiFi.localIP());
   //Fim conexão Wifi
+
+  numSlaves = nodeIDs.size();
+    
+  Serial.print("[master] Number of Slaves: ");
+  Serial.println(numSlaves);
 }
 
 void loopMaster()
@@ -60,7 +66,7 @@ void send(int id)
   //Inicializa o pacote
   LoRa.beginPacket();
   //Envia o que está contido em "GETDATA"
-  LoRa.print(GETDATA[id]);
+  LoRa.print(nodeIDs[id]);
   //Finaliza e envia o pacote
   LoRa.endPacket();
 }
@@ -99,21 +105,24 @@ void receive()
 
       sendToAPI(readingID, temperatureRef, humidityRef);
 
-      if(displayLineToggle)
+      if(idDisplay < MAX_DISPLAY_LINES)
       {
         display.clear();
-        display.drawString(0, 0, "Recebeu: " + data);
+        // Calcula a posição com base no índice
+        int displayOffset = idDisplay * 10; // ou qualquer valor apropriado de acordo com o espaçamento desejado
+        display.drawString(0, displayOffset, "Recebeu: " + data);
+        display.display();
       }
       else
       {
-        display.drawString(0, 10, "Recebeu: " + data);
+        // Se atingir o limite, retorna para a primeira linha
+        idDisplay = 0;
       }
       
+      idDisplay++;
       //                 C  L
-      display.drawString(0, 20, "Tempo: " + waiting + "ms");
+      display.drawString(0, 50, "Tempo: " + waiting + "ms");
       display.display();
-    
-      displayLineToggle = !displayLineToggle;
     }
   }
 }
@@ -125,30 +134,21 @@ void sendToAPI(String readingID, String temperatureAP, String humidityAP)
 
   if (client.connect(host, 80)) // "184.106.153.149" or api.thingspeak.com
       {
-          String postStr = currentAPIKey;
-          if(readingID == "ID0")
-          {
-      
-            Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
-            Serial.println(); 
+        String postStr = currentAPIKey;
+        for(int i = 0; i < numSlaves; i++)
+        {
+          Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
+          Serial.println(); 
 
-            postStr += "&field1=";
-            postStr += String(temperatureAP);
-            postStr += "&field2=";
-            postStr += String(humidityAP);
-          }
-          else if(readingID == "ID1")
-          {
-      
-            Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
-            Serial.println(); 
+          postStr += "&field" + String((i+1)*2 - 1) + "=";
+          postStr += String(temperatureAP);
+          postStr += "&field" + String((i+2)*2 - 1) + "=";
+          postStr += String(humidityAP);
 
-            postStr += "&field3=";
-            postStr += String(temperatureAP);
-            postStr += "&field4=";
-            postStr += String(humidityAP);
-            postStr += "\r\n\r\n\r\n\r\n";
-          }
+        }
+
+        postStr += "\r\n\r\n\r\n\r\n";
+       
         /*    
           postStr += "&field4=";
           postStr += String(rssi);
