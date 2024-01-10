@@ -5,10 +5,9 @@
 
 void setupMaster();
 void loopMaster();
-void send(int);
+void send();
 void receive();
-String processor(const String&);
-void sendToAPI(String, String, String, int);
+void sendToAPI(String, String, String);
 
 extern int rssi;
 extern String loraMessage;
