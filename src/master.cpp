@@ -1,14 +1,17 @@
 #include "master.h"
 
 //Intervalo entre os envios
-#define INTERVAL 2000
+#define INTERVAL 5000
+#define MAX_DISPLAY_LINES 4
+
+//std::map<String, bool> nodeSentStatus; // Mapa para rastrear o status de envio de cada node
 
 //Tempo do último envio
 long lastSendTime = 0;
 int id = 0;
-const int numSlaves = 2;
+int oldId;
 
-bool displayLineToggle = false;
+int idDisplay;
 
 void setupMaster()
 {
@@ -35,6 +38,9 @@ void setupMaster()
   Serial.println("[master] WiFi connected.");
   Serial.print("[master] IP address: "); Serial.println(WiFi.localIP());
   //Fim conexão Wifi
+    
+  Serial.print("[master] Number of Slaves: ");
+  Serial.println(numNodes);
 }
 
 void loopMaster()
@@ -48,7 +54,8 @@ void loopMaster()
     send(id);
 
      // Mova para o próximo escravo usando circular
-    id = (id + 1) % numSlaves;
+    
+    id = (id + 1) % numNodes;
   }
 
   //Verificamos se há pacotes para recebermos
@@ -59,8 +66,9 @@ void send(int id)
 {
   //Inicializa o pacote
   LoRa.beginPacket();
-  //Envia o que está contido em "GETDATA"
-  LoRa.print(GETDATA[id]);
+  //Envia o que está contido em "nodeIDs"
+  //Serial.print("[master] "); Serial.println(nodeIDs[id]); 
+  LoRa.print(nodeIDs[id]);
   //Finaliza e envia o pacote
   LoRa.endPacket();
 }
@@ -69,12 +77,14 @@ void receive()
 {
   //Tentamos ler o pacote
   int packetSize = LoRa.parsePacket();
-  
+
   //Verificamos se o pacote tem o tamanho mínimo de caracteres que esperamos
-  if (packetSize > SETDATA.length()){
+  if (packetSize > SETDATA.length())
+  {
     String received = "";
     //Armazena os dados do pacote em uma string
-    while(LoRa.available()){
+    while(LoRa.available())
+    {
       received += (char) LoRa.read();
     }
     //Verifica se a string possui o que está contido em "SETDATA"
@@ -97,72 +107,62 @@ void receive()
       String temperatureRef = data.substring(pos1 + 1, pos2);
       String humidityRef = data.substring(pos2 + 1, data.length());
 
-      sendToAPI(readingID, temperatureRef, humidityRef);
+      sendToAPI(readingID, temperatureRef, humidityRef, id);  
 
-      if(displayLineToggle)
+      if(idDisplay <= MAX_DISPLAY_LINES)
       {
         display.clear();
-        display.drawString(0, 0, "Recebeu: " + data);
+        // Calcula a posição com base no índice
+        int displayOffset = idDisplay * 10; // ou qualquer valor apropriado de acordo com o espaçamento desejado
+        display.drawString(0, displayOffset, "Recebeu: " + data);
+        display.display();
       }
       else
       {
-        display.drawString(0, 10, "Recebeu: " + data);
+        // Se atingir o limite, retorna para a primeira linha
+        idDisplay = 0;
       }
       
+      idDisplay++;
       //                 C  L
-      display.drawString(0, 20, "Tempo: " + waiting + "ms");
+      display.drawString(0, 50, "Tempo: " + waiting + "ms");
       display.display();
-    
-      displayLineToggle = !displayLineToggle;
+      
     }
-  }
+  }    
 }
 
-void sendToAPI(String readingID, String temperatureAP, String humidityAP)
+void sendToAPI(String readingID, String temperatureAP, String humidityAP, int id)
 {
   // Converta a String para const char*
   const char* host = currentURL.c_str();
 
   if (client.connect(host, 80)) // "184.106.153.149" or api.thingspeak.com
-      {
-          String postStr = currentAPIKey;
-          if(readingID == "ID0")
-          {
-      
-            Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
-            Serial.println(); 
+  {
+    String postStr = currentAPIKey;
+  
+    Serial.print("[master] "); Serial.print(readingID); 
+    Serial.print(" "); Serial.print(temperatureAP); Serial.print(" "); Serial.print(humidityAP); 
+    Serial.println(); 
 
-            postStr += "&field1=";
-            postStr += String(temperatureAP);
-            postStr += "&field2=";
-            postStr += String(humidityAP);
-          }
-          else if(readingID == "ID1")
-          {
-      
-            Serial.print("[master] "); Serial.print(readingID); Serial.print(" "); Serial.print(temperatureAP);
-            Serial.println(); 
+    postStr += "&field" + String((id+1)*2 - 1) + "=";
+    Serial.print("[master] Indice AP "); Serial.print(String((id+1)*2 - 2)); 
+    Serial.print(" "); Serial.println(String((id+1)*2 - 1)); 
+    postStr += String(temperatureAP);
+    postStr += "&field" + String((id+2)*2 - 2) + "=";
+    postStr += String(humidityAP);
 
-            postStr += "&field3=";
-            postStr += String(temperatureAP);
-            postStr += "&field4=";
-            postStr += String(humidityAP);
-            postStr += "\r\n\r\n\r\n\r\n";
-          }
-        /*    
-          postStr += "&field4=";
-          postStr += String(rssi);
-          postStr += "\r\n\r\n\r\n\r\n";
-        */
-          client.print("POST /update HTTP/1.1\n");
-          client.print("Host: api.thingspeak.com\n");
-          client.print("Connection: close\n");
-          client.print("X-THINGSPEAKAPIKEY: " + currentAPIKey + "\n");
-          client.print("Content-Type: application/x-www-form-urlencoded\n");
-          client.print("Content-Length: ");
-          client.print(postStr.length());
-          client.print("\n\n");
-          client.print(postStr);
-    
-        }    
+    postStr += "\r\n\r\n\r\n\r\n";
+
+    client.print("POST /update HTTP/1.1\n");
+    client.print("Host: api.thingspeak.com\n");
+    client.print("Connection: close\n");
+    client.print("X-THINGSPEAKAPIKEY: " + currentAPIKey + "\n");
+    client.print("Content-Type: application/x-www-form-urlencoded\n");
+    client.print("Content-Length: ");
+    client.print(postStr.length());
+    client.print("\n\n");
+    client.print(postStr);
+
+  }    
 }

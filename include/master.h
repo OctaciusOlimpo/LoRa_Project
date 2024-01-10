@@ -8,7 +8,7 @@ void loopMaster();
 void send(int);
 void receive();
 String processor(const String&);
-void sendToAPI(String, String, String);
+void sendToAPI(String, String, String, int);
 
 extern int rssi;
 extern String loraMessage;

@@ -7,8 +7,6 @@ void setupSlave();
 void loopSlave();
 void readData();
 
-extern int count;
-
 extern String humidity;
 extern String temperature;
 
