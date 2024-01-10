@@ -1,7 +1,7 @@
 #include "master.h"
 
 //Intervalo entre os envios
-#define INTERVAL 5000
+#define INTERVAL 1000
 #define MAX_DISPLAY_LINES 4
 
 //std::map<String, bool> nodeSentStatus; // Mapa para rastrear o status de envio de cada node
@@ -9,7 +9,6 @@
 //Tempo do último envio
 long lastSendTime = 0;
 int id = 0;
-int oldId;
 
 int idDisplay;
 
@@ -51,18 +50,14 @@ void loopMaster()
     //Marcamos o tempo que ocorreu o último envio
     lastSendTime = millis();
     //Envia o pacote para informar ao Slave que queremos receber os dados
-    send(id);
-
-     // Mova para o próximo escravo usando circular
-    
-    id = (id + 1) % numNodes;
+    send();
   }
 
   //Verificamos se há pacotes para recebermos
   receive();
 }
 
-void send(int id)
+void send()
 {
   //Inicializa o pacote
   LoRa.beginPacket();
@@ -89,7 +84,8 @@ void receive()
     }
     //Verifica se a string possui o que está contido em "SETDATA"
     int index = received.indexOf(SETDATA);
-    if(index >= 0){
+    if(index >= 0)
+    {
       //Recuperamos a string que está após o "SETDATA",
       //que no caso serão os dados de nosso interesse
       String data = received.substring(SETDATA.length());
@@ -107,32 +103,35 @@ void receive()
       String temperatureRef = data.substring(pos1 + 1, pos2);
       String humidityRef = data.substring(pos2 + 1, data.length());
 
-      sendToAPI(readingID, temperatureRef, humidityRef, id);  
+      Serial.println("[master] ID" + String(id) + " " + readingID);
+      if(("ID" + String(id)) == readingID)
+      { 
+        sendToAPI(readingID, temperatureRef, humidityRef);  
 
-      if(idDisplay <= MAX_DISPLAY_LINES)
-      {
-        display.clear();
-        // Calcula a posição com base no índice
-        int displayOffset = idDisplay * 10; // ou qualquer valor apropriado de acordo com o espaçamento desejado
-        display.drawString(0, displayOffset, "Recebeu: " + data);
+        if(idDisplay <= MAX_DISPLAY_LINES)
+        {
+          display.clear();
+          // Calcula a posição com base no índice
+          int displayOffset = idDisplay * 10; // ou qualquer valor apropriado de acordo com o espaçamento desejado
+          display.drawString(0, displayOffset, "Recebeu: " + data);
+          display.display();
+        }
+        else
+        {
+          // Se atingir o limite, retorna para a primeira linha
+          idDisplay = 0;
+        }
+        
+        idDisplay++;
+        //                 C  L
+        display.drawString(0, 50, "Tempo: " + waiting + "ms");
         display.display();
       }
-      else
-      {
-        // Se atingir o limite, retorna para a primeira linha
-        idDisplay = 0;
-      }
-      
-      idDisplay++;
-      //                 C  L
-      display.drawString(0, 50, "Tempo: " + waiting + "ms");
-      display.display();
-      
     }
   }    
 }
 
-void sendToAPI(String readingID, String temperatureAP, String humidityAP, int id)
+void sendToAPI(String idAP, String temperatureAP, String humidityAP)
 {
   // Converta a String para const char*
   const char* host = currentURL.c_str();
@@ -141,7 +140,7 @@ void sendToAPI(String readingID, String temperatureAP, String humidityAP, int id
   {
     String postStr = currentAPIKey;
   
-    Serial.print("[master] "); Serial.print(readingID); 
+    Serial.print("[master] "); Serial.print(idAP); 
     Serial.print(" "); Serial.print(temperatureAP); Serial.print(" "); Serial.print(humidityAP); 
     Serial.println(); 
 
@@ -163,6 +162,9 @@ void sendToAPI(String readingID, String temperatureAP, String humidityAP, int id
     client.print(postStr.length());
     client.print("\n\n");
     client.print(postStr);
+
+    // Mova para o próximo escravo usando circular
+    id = (id + 1) % numNodes;
 
   }    
 }
