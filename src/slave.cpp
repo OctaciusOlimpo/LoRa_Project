@@ -7,6 +7,7 @@ const int NUM_SAMPLES = 10;
 float humiditySamples[NUM_SAMPLES];
 float temperatureSamples[NUM_SAMPLES];
 int sampleIndex = 0;
+String nodeID;
 
 DHTesp dht;
 
@@ -21,7 +22,8 @@ void setupSlave()
   display.drawString(0, 0, "Slave esperando...");
   display.display();
 
-  dht.setup(0, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
+  dht.setup(21, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
+  nodeID = "ID"+ String(currentID.substring(4).toInt());
 
   // Inicializa os arrays com um valor que representa uma amostra não coletada
   for (int i = 0; i < NUM_SAMPLES; i++) 
@@ -61,7 +63,7 @@ void loopSlave()
       LoRa.endPacket();
       //Mostra no display
       display.clear();
-      Serial.println("[slave] Enviou: " + String(data));
+      Serial.println("[slave] Enviou: " + String(data) + " " + currentID + " " + nodeID);
       display.drawString(0, 0, "Enviou: " + String(data));
       display.display();
     }
