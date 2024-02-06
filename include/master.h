@@ -1,6 +1,8 @@
 #ifndef MASTER_H
 #define MASTER_H
 
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
 #include "main.h"
 
 void setupMaster();
