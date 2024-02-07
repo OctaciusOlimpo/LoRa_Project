@@ -4,6 +4,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include "main.h"
+#include "internetStuff.h"
 
 void setupMaster();
 void loopMaster();

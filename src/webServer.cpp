@@ -38,18 +38,6 @@ std::vector<String> nodeIDs;
 AsyncWebServer server (80);
 WiFiClient client;
 
-void setupWebServer()
-{
-    #ifdef MASTER
-        // Configuração inicial do Master
-        setupAPMaster();
-    #else
-        // Configuração inicial do Slave
-        setupAPSlave();
-    #endif
-    
-}
-
 void setupAPMaster()
 {
     Serial.println("[webServer] Configuring AP Mode (Access Point)...");
@@ -85,11 +73,9 @@ void setupAPMaster()
     Serial.print("[webServer] Open a browser and go to http://");
     Serial.print(WiFi.softAPIP());
     Serial.println("/");
-    
-    // internetModule* internetController = &internetModule::getSingleton();
 
     Serial.println("[webServer] Configuring routes on the web server...");
-    server.on("/", HTTP_GET, [/*internetController*/](AsyncWebServerRequest *request) 
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) 
     {
         // Modificação do cabeçalho HTML
         String html = "<html><head><title>Gateway Configuration</title>";
@@ -103,7 +89,6 @@ void setupAPMaster()
         html += "</style>";
         html += "</head><body>";
         html += "<h1 style='color: #800080;'>Gateway Configuration Settings</h1>";
-        // html += "<p>Wi-Fi status: " + internetController->connectionToString[internetController->connected.wifi] + ".</p>";
         html += "<form action='/config' method='POST'>";
         html += "<label for='ssid'>Network name:</label> <input type='text' name='ssid'><br>";
         html += "Empty password? <input type='checkbox' name='noPassword'><br>";

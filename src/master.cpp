@@ -22,34 +22,25 @@ int idDisplay;
 void reconectarMQTT();
 void enviarDadosMQTT(String, String, String, String);
 
+WiFiConn* wifiConn;
+
 void setupMaster()
 {
   //Chama a configuração inicial do display
   setupDisplay();
   //Chama a configuração inicial do LoRa
   setupLoRa();
+  //Chama a configuração do servidor web
+  setupAPMaster();
 
   display.clear();
   display.drawString(0, 0, "Master");
   display.display();
 
-  // internetModule& internetController = internetModule::getSingleton();
+  wifiConn = new WiFiConn(currentSSID, currentPassword);
 
-  //Conexão Wifi
-  Serial.print("[master] Connecting to ");
-  Serial.println(currentSSID);
-  WiFi.begin(currentSSID, currentPassword);
-  while(WiFi.status() != WL_CONNECTED)
-  {
-    delay(2000);
-    Serial.print(".");
-  }
+  wifiConn->connect();
 
-  Serial.println("");
-  Serial.println("[master] WiFi connected.");
-  Serial.print("[master] IP address: "); Serial.println(WiFi.localIP());
-  //Fim conexão Wifi
-    
   // Configurar o servidor MQTT
   clientPubSub.setServer(mqtt_server, mqtt_port);
 
@@ -58,14 +49,10 @@ void setupMaster()
 
   while(true)
   {
-    // while (!internetController.wifiConnected())
-    // {
-    //   vTaskDelay(100/portTICK_PERIOD_MS);
-    // }
-
     // Reconectar ao servidor MQTT se necessário
-    if (!clientPubSub.connected()) 
+    if (!clientPubSub.connected()) //internetController.pubsubConnected() 
     {
+      // internetController.reconectarMQTT();
       reconectarMQTT();
     }
 
@@ -80,6 +67,8 @@ void setupMaster()
 
     // Lidar com eventos MQTT
     clientPubSub.loop();
+
+    // internetController.pubsubLoop();
 
     // // Adicione um pequeno atraso para dar um respiro ao sistema
     // delay(100);
