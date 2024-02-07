@@ -2,11 +2,14 @@
 
 String humidity = "";
 String temperature = "";
+String rssi = "";
 
 const int NUM_SAMPLES = 10;
 float humiditySamples[NUM_SAMPLES];
 float temperatureSamples[NUM_SAMPLES];
+float rssiSamples[NUM_SAMPLES];
 int sampleIndex = 0;
+
 String nodeID;
 
 DHTesp dht;
@@ -30,6 +33,7 @@ void setupSlave()
   {
     humiditySamples[i] = -1;
     temperatureSamples[i] = -1;
+    rssiSamples[i] = -1;
   }
 }
 
@@ -54,7 +58,7 @@ void loopSlave()
     {
       //Simula a leitura dos dados
       readData();
-      String data = nodeID + "/" + temperature + "&" + humidity;
+      String data = nodeID + "/" + temperature + "&" + humidity + "&" + rssi;
       Serial.println("[slave] Criando pacote para envio");
       //Cria o pacote para envio
       LoRa.beginPacket();
@@ -80,10 +84,12 @@ void readData()
   delay(dht.getMinimumSamplingPeriod());
   float currentHumidity = dht.getHumidity();
   float currentTemperature = dht.getTemperature();
+  float currentRssi = LoRa.packetRssi();
 
   // Atualiza os arrays de amostras
   humiditySamples[sampleIndex] = currentHumidity;
   temperatureSamples[sampleIndex] = currentTemperature;
+  rssiSamples[sampleIndex] = currentRssi;
 
   // Avança para o próximo índice de amostra circular
   sampleIndex = (sampleIndex + 1) % NUM_SAMPLES;
@@ -91,6 +97,8 @@ void readData()
   // Calcula a média móvel
   float averageHumidity = 0;
   float averageTemperature = 0;
+  float averageRssi = 0;
+
   int count = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) 
@@ -100,6 +108,8 @@ void readData()
     {  // Supondo que -1 seja um valor de inicialização para indicar uma amostra não válida
       averageHumidity += humiditySamples[i];
       averageTemperature += temperatureSamples[i];
+      averageRssi += rssiSamples[i];
+
       count++;
     }
   }
@@ -108,10 +118,12 @@ void readData()
   {  // Evita divisão por zero
     averageHumidity /= count;
     averageTemperature /= count;
+    averageRssi /= count;
   }
 
   // Atualiza as variáveis globais (pode ser modificado conforme sua necessidade)
   humidity = String(averageHumidity);
   temperature = String(averageTemperature);
+  rssi = String(averageRssi);
 }
 

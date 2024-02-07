@@ -15,6 +15,7 @@
 #include "webServer.h"
 #include "master.h"
 #include "slave.h"
+#include "internetStuff.h"
 
 //Deixe esta linha descomentada para compilar o Master
 //Comente ou remova para compilar o Slave

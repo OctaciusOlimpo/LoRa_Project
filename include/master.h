@@ -11,7 +11,7 @@ void send();
 void receive();
 void sendToAPI(String, String, String);
 
-extern int rssi;
+// extern int rssi;
 extern String loraMessage;
 extern String readingID;
 

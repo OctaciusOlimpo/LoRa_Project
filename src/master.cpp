@@ -20,7 +20,7 @@ int id = 0;
 int idDisplay;
 
 void reconectarMQTT();
-void enviarDadosMQTT(String, String, String);
+void enviarDadosMQTT(String, String, String, String);
 
 void setupMaster()
 {
@@ -32,6 +32,8 @@ void setupMaster()
   display.clear();
   display.drawString(0, 0, "Master");
   display.display();
+
+  // internetModule& internetController = internetModule::getSingleton();
 
   //Conexão Wifi
   Serial.print("[master] Connecting to ");
@@ -53,33 +55,43 @@ void setupMaster()
 
   Serial.print("[master] Number of Slaves: ");
   Serial.println(numNodes);
+
+  while(true)
+  {
+    // while (!internetController.wifiConnected())
+    // {
+    //   vTaskDelay(100/portTICK_PERIOD_MS);
+    // }
+
+    // Reconectar ao servidor MQTT se necessário
+    if (!clientPubSub.connected()) 
+    {
+      reconectarMQTT();
+    }
+
+    //Se passou o tempo definido em INTERVAL desde o último envio
+    if (millis() - lastSendTime > INTERVAL)
+    {
+      //Marcamos o tempo que ocorreu o último envio
+      lastSendTime = millis();
+      //Envia o pacote para informar ao Slave que queremos receber os dados
+      send();
+    }
+
+    // Lidar com eventos MQTT
+    clientPubSub.loop();
+
+    // // Adicione um pequeno atraso para dar um respiro ao sistema
+    // delay(100);
+
+    //Verificamos se há pacotes para recebermos
+    receive();
+  }
 }
 
 void loopMaster()
 {
-  // Reconectar ao servidor MQTT se necessário
-  if (!clientPubSub.connected()) 
-  {
-    reconectarMQTT();
-  }
-
-  //Se passou o tempo definido em INTERVAL desde o último envio
-  if (millis() - lastSendTime > INTERVAL)
-  {
-    //Marcamos o tempo que ocorreu o último envio
-    lastSendTime = millis();
-    //Envia o pacote para informar ao Slave que queremos receber os dados
-    send();
-  }
-
-  // Lidar com eventos MQTT
-  clientPubSub.loop();
-
-  // // Adicione um pequeno atraso para dar um respiro ao sistema
-  // delay(100);
-
-  //Verificamos se há pacotes para recebermos
-  receive();
+  vTaskDelete(NULL);
 }
 
 void send()
@@ -122,18 +134,20 @@ void receive()
       //display.clear();
       
       int pos1 = data.indexOf('/');   
-      int pos2 = data.indexOf('&');
+      int pos2 = data.indexOf('&', pos1 + 1);
+      int pos3 = data.indexOf('&', pos2 + 1);
 
       String readingID = data.substring(0, pos1);
       String temperatureRef = data.substring(pos1 + 1, pos2);
-      String humidityRef = data.substring(pos2 + 1, data.length());
+      String humidityRef = data.substring(pos2 + 1, pos3);
+      String rssiRef = data.substring(pos3 + 1, data.length());
 
       Serial.println("[master] ID" + String(id) + " " + readingID);
       if(("ID" + String(id)) == readingID)
       { 
         // sendToAPI(readingID, temperatureRef, humidityRef);  
         // Enviar dados via MQTT
-        enviarDadosMQTT(readingID, temperatureRef, humidityRef);
+        enviarDadosMQTT(readingID, temperatureRef, humidityRef, rssiRef);
 
         if(idDisplay <= MAX_DISPLAY_LINES)
         {
@@ -208,14 +222,14 @@ void reconectarMQTT()
     else 
     {
       Serial.print("[master] Falha na conexão, rc=");
-      Serial.print(clientPubSub.state());
+      Serial.println(clientPubSub.state());
       Serial.println("[master] Tentando novamente em 5 segundos...");
       delay(5000);
     }
   }
 }
 
-void enviarDadosMQTT(String idRef, String temperaturaRef, String umidadeRef) 
+void enviarDadosMQTT(String idRef, String temperaturaRef, String umidadeRef, String rssiRef) 
 {
   // Criar um objeto JSON
   JsonDocument doc; // Defina o tamanho conforme necessário
@@ -224,7 +238,8 @@ void enviarDadosMQTT(String idRef, String temperaturaRef, String umidadeRef)
   doc["id"] = idRef;
   doc["temperature"] = temperaturaRef.toFloat(); // Converter para float
   doc["humidity"] = umidadeRef.toFloat(); // Converter para float
-  
+  doc["rssi"] = rssiRef.toFloat();
+
   // Serializar o objeto JSON em uma string
   String mensagem;
   serializeJson(doc, mensagem);
