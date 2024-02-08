@@ -4,7 +4,14 @@
 #define INTERVAL 1000
 #define MAX_DISPLAY_LINES 4
 
-//std::map<String, bool> nodeSentStatus; // Mapa para rastrear o status de envio de cada node
+// Informações do Broker MQTT
+const char* mqtt_server = "192.168.0.176";
+const int mqtt_port = 1883;
+const char* mqtt_user = "esp32-gateway-1";
+const char* mqtt_password = "wonder";
+
+WiFiClient espClient;
+PubSubClient clientPubSub(espClient);
 
 //Tempo do último envio
 long lastSendTime = 0;
@@ -12,49 +19,68 @@ int id = 0;
 
 int idDisplay;
 
+void reconectarMQTT();
+void enviarDadosMQTT(String, String, String, String);
+
+WiFiConn* wifiConn;
+
 void setupMaster()
 {
   //Chama a configuração inicial do display
   setupDisplay();
   //Chama a configuração inicial do LoRa
   setupLoRa();
+  //Chama a configuração do servidor web
+  setupAPMaster();
 
   display.clear();
   display.drawString(0, 0, "Master");
   display.display();
 
-  //Conexão Wifi
-  Serial.print("[master] Connecting to ");
-  Serial.println(currentSSID);
-  WiFi.begin(currentSSID, currentPassword);
-  while(WiFi.status() != WL_CONNECTED)
-  {
-    delay(2000);
-    Serial.print(".");
-  }
+  wifiConn = new WiFiConn(currentSSID, currentPassword);
 
-  Serial.println("");
-  Serial.println("[master] WiFi connected.");
-  Serial.print("[master] IP address: "); Serial.println(WiFi.localIP());
-  //Fim conexão Wifi
-    
+  wifiConn->connect();
+
+  // Configurar o servidor MQTT
+  clientPubSub.setServer(mqtt_server, mqtt_port);
+
   Serial.print("[master] Number of Slaves: ");
   Serial.println(numNodes);
+
+  while(true)
+  {
+    // Reconectar ao servidor MQTT se necessário
+    if (!clientPubSub.connected()) //internetController.pubsubConnected() 
+    {
+      // internetController.reconectarMQTT();
+      reconectarMQTT();
+    }
+
+    //Se passou o tempo definido em INTERVAL desde o último envio
+    if (millis() - lastSendTime > INTERVAL)
+    {
+      //Marcamos o tempo que ocorreu o último envio
+      lastSendTime = millis();
+      //Envia o pacote para informar ao Slave que queremos receber os dados
+      send();
+    }
+
+    // Lidar com eventos MQTT
+    clientPubSub.loop();
+
+    // internetController.pubsubLoop();
+
+    // // Adicione um pequeno atraso para dar um respiro ao sistema
+    // delay(100);
+
+    //Verificamos se há pacotes para recebermos
+    receive();
+  }
 }
 
 void loopMaster()
 {
-  //Se passou o tempo definido em INTERVAL desde o último envio
-  if (millis() - lastSendTime > INTERVAL)
-  {
-    //Marcamos o tempo que ocorreu o último envio
-    lastSendTime = millis();
-    //Envia o pacote para informar ao Slave que queremos receber os dados
-    send();
-  }
-
-  //Verificamos se há pacotes para recebermos
-  receive();
+  vTaskDelete(NULL);
 }
 
 void send()
@@ -97,16 +123,20 @@ void receive()
       //display.clear();
       
       int pos1 = data.indexOf('/');   
-      int pos2 = data.indexOf('&');
+      int pos2 = data.indexOf('&', pos1 + 1);
+      int pos3 = data.indexOf('&', pos2 + 1);
 
       String readingID = data.substring(0, pos1);
       String temperatureRef = data.substring(pos1 + 1, pos2);
-      String humidityRef = data.substring(pos2 + 1, data.length());
+      String humidityRef = data.substring(pos2 + 1, pos3);
+      String rssiRef = data.substring(pos3 + 1, data.length());
 
       Serial.println("[master] ID" + String(id) + " " + readingID);
       if(("ID" + String(id)) == readingID)
       { 
-        sendToAPI(readingID, temperatureRef, humidityRef);  
+        // sendToAPI(readingID, temperatureRef, humidityRef);  
+        // Enviar dados via MQTT
+        enviarDadosMQTT(readingID, temperatureRef, humidityRef, rssiRef);
 
         if(idDisplay <= MAX_DISPLAY_LINES)
         {
@@ -131,40 +161,81 @@ void receive()
   }    
 }
 
-void sendToAPI(String idAP, String temperatureAP, String humidityAP)
-{
-  // Converta a String para const char*
-  const char* host = currentURL.c_str();
+// void sendToAPI(String idAP, String temperatureAP, String humidityAP)
+// {
+//   // Converta a String para const char*
+//   const char* host = currentURL.c_str();
 
-  if (client.connect(host, 80)) // "184.106.153.149" or api.thingspeak.com
-  {
-    String postStr = currentAPIKey;
+//   if (client.connect(host, 80)) // "184.106.153.149" or api.thingspeak.com
+//   {
+//     String postStr = currentAPIKey;
   
-    Serial.print("[master] "); Serial.print(idAP); 
-    Serial.print(" "); Serial.print(temperatureAP); Serial.print(" "); Serial.print(humidityAP); 
-    Serial.println(); 
+//     Serial.print("[master] "); Serial.print(idAP); 
+//     Serial.print(" "); Serial.print(temperatureAP); Serial.print(" "); Serial.print(humidityAP); 
+//     Serial.println(); 
 
-    postStr += "&field" + String((id+1)*2 - 1) + "=";
-    Serial.print("[master] Indice AP "); Serial.print(String((id+1)*2 - 2)); 
-    Serial.print(" "); Serial.println(String((id+1)*2 - 1)); 
-    postStr += String(temperatureAP);
-    postStr += "&field" + String((id+2)*2 - 2) + "=";
-    postStr += String(humidityAP);
+//     postStr += "&field" + String((id+1)*2 - 1) + "=";
+//     Serial.print("[master] Indice AP "); Serial.print(String((id+1)*2 - 2)); 
+//     Serial.print(" "); Serial.println(String((id+1)*2 - 1)); 
+//     postStr += String(temperatureAP);
+//     postStr += "&field" + String((id+2)*2 - 2) + "=";
+//     postStr += String(humidityAP);
 
-    postStr += "\r\n\r\n\r\n\r\n";
+//     postStr += "\r\n\r\n\r\n\r\n";
 
-    client.print("POST /update HTTP/1.1\n");
-    client.print("Host: api.thingspeak.com\n");
-    client.print("Connection: close\n");
-    client.print("X-THINGSPEAKAPIKEY: " + currentAPIKey + "\n");
-    client.print("Content-Type: application/x-www-form-urlencoded\n");
-    client.print("Content-Length: ");
-    client.print(postStr.length());
-    client.print("\n\n");
-    client.print(postStr);
+//     client.print("POST /update HTTP/1.1\n");
+//     client.print("Host: api.thingspeak.com\n");
+//     client.print("Connection: close\n");
+//     client.print("X-THINGSPEAKAPIKEY: " + currentAPIKey + "\n");
+//     client.print("Content-Type: application/x-www-form-urlencoded\n");
+//     client.print("Content-Length: ");
+//     client.print(postStr.length());
+//     client.print("\n\n");
+//     client.print(postStr);
 
-    // Mova para o próximo escravo usando circular
-    id = (id + 1) % numNodes;
+//     // Mova para o próximo escravo usando circular
+//     id = (id + 1) % numNodes;
 
-  }    
+//   }    
+// }
+
+void reconectarMQTT() 
+{
+  while (!clientPubSub.connected()) 
+  {
+    Serial.println("[master] Conectando ao servidor MQTT...");
+    if (clientPubSub.connect("ESP32Client", mqtt_user, mqtt_password)) 
+    {
+      Serial.println("[master] Conectado ao servidor MQTT");
+    } 
+    else 
+    {
+      Serial.print("[master] Falha na conexão, rc=");
+      Serial.println(clientPubSub.state());
+      Serial.println("[master] Tentando novamente em 5 segundos...");
+      delay(5000);
+    }
+  }
+}
+
+void enviarDadosMQTT(String idRef, String temperaturaRef, String umidadeRef, String rssiRef) 
+{
+  // Criar um objeto JSON
+  JsonDocument doc; // Defina o tamanho conforme necessário
+  
+  // Adicionar os valores ao objeto JSON
+  doc["id"] = idRef;
+  doc["temperature"] = temperaturaRef.toFloat(); // Converter para float
+  doc["humidity"] = umidadeRef.toFloat(); // Converter para float
+  doc["rssi"] = rssiRef.toFloat();
+
+  // Serializar o objeto JSON em uma string
+  String mensagem;
+  serializeJson(doc, mensagem);
+
+  // Publicar a mensagem MQTT
+  clientPubSub.publish("teste", mensagem.c_str());
+
+  // Mova para o próximo escravo usando circular
+  id = (id + 1) % numNodes;
 }

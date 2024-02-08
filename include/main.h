@@ -15,10 +15,11 @@
 #include "webServer.h"
 #include "master.h"
 #include "slave.h"
+#include "internetStuff.h"
 
 //Deixe esta linha descomentada para compilar o Master
 //Comente ou remova para compilar o Slave
-#define MASTER
+//#define MASTER
 
 #define SCK 5   // GPIO5  SCK
 #define MISO 19 // GPIO19 MISO

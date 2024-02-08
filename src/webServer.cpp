@@ -8,9 +8,16 @@ const int serverPort = 80;
 
 int nodeNumber;
 
-#ifndef IDNODE
-#define IDNODE "NODE" // Default value if not specified in build flags
+#ifdef MASTER
+    #ifndef ID
+    #define ID "GATEWAY-AP" // Default value if not specified in build flags
+    #endif
+#else
+    #ifndef ID
+    #define ID "NODE" // Default value if not specified in build flags
+    #endif
 #endif
+
 #ifndef WIFISSID
 #define WIFISSID "Rorschach" // Default value if not specified in build flags
 #endif
@@ -20,11 +27,10 @@ int nodeNumber;
 
 String currentSSID = String(WIFISSID);
 String currentPassword = String(PASSWORD);
-String currentIDNode = String(IDNODE);
+String currentID = String(ID);
 String currentURL = "api.thingspeak.com";
 String currentAPIKey = "YF3V4U4D4C5CLVDR";
 
-String nodeID;
 int numNodes;
 
 std::vector<String> nodeIDs;
@@ -32,34 +38,10 @@ std::vector<String> nodeIDs;
 AsyncWebServer server (80);
 WiFiClient client;
 
-void setupWebServer()
-{
-    #ifdef MASTER
-        // Configuração inicial do Master
-        setupAPMaster();
-    #else
-        // Configuração inicial do Slave
-        setupAPSlave();
-    #endif
-    
-    // Chama a função uma vez no início para obter os IDs dos nodes
-    nodeIDs = scanAndCreateNodeIDs();
-
-    numNodes = nodeIDs.size();
-    while (numNodes == 0) 
-    {
-        Serial.println("[webServer] Looking for nodes!");
-
-        delay(1000); // Espera um segundo antes de tentar novamente
-        nodeIDs = scanAndCreateNodeIDs();
-        numNodes = nodeIDs.size(); // Tentativa de reescanear
-    }
-}
-
 void setupAPMaster()
 {
     Serial.println("[webServer] Configuring AP Mode (Access Point)...");
-    WiFi.softAP(ssid, password);
+    WiFi.softAP(currentID.c_str(), password);
 
     /*
     preferences.begin("configuracoes", false);
@@ -91,7 +73,7 @@ void setupAPMaster()
     Serial.print("[webServer] Open a browser and go to http://");
     Serial.print(WiFi.softAPIP());
     Serial.println("/");
-    
+
     Serial.println("[webServer] Configuring routes on the web server...");
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) 
     {
@@ -157,6 +139,18 @@ void setupAPMaster()
         WiFi.disconnect();
     });
 
+    // Chama a função uma vez no início para obter os IDs dos nodes
+    nodeIDs = scanAndCreateNodeIDs();
+
+    numNodes = nodeIDs.size();
+    while (numNodes == 0) 
+    {
+        Serial.println("[webServer] Looking for nodes!");
+
+        delay(1000); // Espera um segundo antes de tentar novamente
+        nodeIDs = scanAndCreateNodeIDs();
+        numNodes = nodeIDs.size(); // Tentativa de reescanear
+    }
 }
 
 void setupAPSlave()
@@ -166,15 +160,15 @@ void setupAPSlave()
 
     for (int i = 0; i < apCount; i++) 
     {
-        if (WiFi.SSID(i) == currentIDNode) 
-        {
-            currentIDNode = String(currentIDNode) + String(suffix);
-            suffix++;
-            i = -1; // Restart the loop to check uniqueness of the new SSID
-        }
+      if (WiFi.SSID(i) == currentID) 
+      {
+        currentID = "NODE" + String(suffix);
+        suffix++;
+        i = -1; // Reiniciar o loop para verificar a singularidade do novo SSID
+      }
     }
 
-    WiFi.softAP(currentIDNode, password);
+    WiFi.softAP(currentID.c_str(), password);
 }
 
 std::vector<String> scanAndCreateNodeIDs() 
@@ -183,6 +177,8 @@ std::vector<String> scanAndCreateNodeIDs()
 
   // Realiza a varredura das redes Wi-Fi disponíveis
   int networkCount = WiFi.scanNetworks();
+  int maxNodeNumber = -1;  // Inicializa o valor máximo como -1 para NODE0
+
   for (int i = 0; i < networkCount; i++) 
   {
     String ssid = WiFi.SSID(i);
@@ -190,6 +186,8 @@ std::vector<String> scanAndCreateNodeIDs()
     // Verifica se o SSID está no formato "NODE" seguido ou não por um número
     if (ssid.startsWith("NODE")) 
     {
+      int nodeNumber;
+
       // Verifica se o SSID é exatamente "NODE"
       if (ssid == "NODE") 
       {
@@ -201,11 +199,16 @@ std::vector<String> scanAndCreateNodeIDs()
         nodeNumber = ssid.substring(4).toInt();
       }
 
-      nodeID = "ID" + String(nodeNumber);
-
-      // Adiciona o ID ao vetor
-      nodeIDs.push_back(nodeID);
+      // Atualiza o valor máximo encontrado até agora
+      maxNodeNumber = max(maxNodeNumber, nodeNumber);
     }
+  }
+
+  // Cria o vetor de IDs com base no valor máximo encontrado
+  for (int i = 0; i <= maxNodeNumber; i++) 
+  {
+    String nodeID = "ID" + String(i);
+    nodeIDs.push_back(nodeID);
   }
 
   return nodeIDs;

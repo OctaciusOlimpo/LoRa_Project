@@ -1,0 +1,25 @@
+services:
+  influx:
+    image: influxdb:2.0
+    ports:
+      - 8086:8086
+    volumes:
+      - influx:/var/lib/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: esp32-gateway-1
+      DOCKER_INFLUXDB_INIT_PASSWORD: W@nder123
+      DOCKER_INFLUXDB_INIT_ORG: lora
+      DOCKER_INFLUXDB_INIT_BUCKET: lora
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: 383502ea-9354-49f6-81b5-ce9c072e9676
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+
+
+volumes:
+  influx: {}
+  grafana: {}

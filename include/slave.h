@@ -7,9 +7,10 @@ void setupSlave();
 void loopSlave();
 void readData();
 
-extern String humidity;
-extern String temperature;
+// extern String humidity;
+// extern String temperature;
+// extern String rssi;
 
-extern DHTesp dht;
+// extern DHTesp dht;
 
 #endif // SLAVE_H
