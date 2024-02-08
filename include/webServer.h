@@ -11,12 +11,8 @@ extern String currentAPIKey;
 extern int numNodes;
 extern int nodeNumber;
 
-void setupWebServer();
-void setupAPMaster();
-void setupAPSlave();
-
-extern WiFiClient client;
-extern AsyncWebServer server;
+void setupAPController();
+void setupAPResponder();
 
 extern std::vector<String> nodeIDs;
 std::vector<String> scanAndCreateNodeIDs();

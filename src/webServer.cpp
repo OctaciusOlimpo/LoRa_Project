@@ -1,4 +1,4 @@
-#include "webServer.h"
+#include "webserver.h"
 
 Preferences preferences;
 
@@ -8,7 +8,7 @@ const int serverPort = 80;
 
 int nodeNumber;
 
-#ifdef MASTER
+#ifdef CONTROLLER
     #ifndef ID
     #define ID "GATEWAY-AP" // Default value if not specified in build flags
     #endif
@@ -31,39 +31,24 @@ String currentID = String(ID);
 String currentURL = "api.thingspeak.com";
 String currentAPIKey = "YF3V4U4D4C5CLVDR";
 
+bool currentEnableConfig = false;
+int currentBandwidth;
+int currentCodingRate;
+int currentSpreadingFactor;
+int currentTxPower;
+bool currentEnablePABOOST;
+
 int numNodes;
 
 std::vector<String> nodeIDs;
 
-AsyncWebServer server (80);
-WiFiClient client;
+AsyncWebServer server(80);
+// WiFiClient client;
 
-void setupAPMaster()
+void setupAPController()
 {
     Serial.println("[webServer] Configuring AP Mode (Access Point)...");
     WiFi.softAP(currentID.c_str(), password);
-
-    /*
-    preferences.begin("configuracoes", false);
-
-        if(!preferences.getString("ssid", "").isEmpty()) 
-        {
-            currentSSID = preferences.getString("ssid", "");
-        }
-        if(!preferences.getString("password", "").isEmpty()) 
-        {
-            currentPassword = preferences.getString("password", "");
-        }
-        if(!preferences.getString("url", "").isEmpty()) 
-        {
-            currentURL = preferences.getString("url", "");
-        }
-        if(!preferences.getString("APIKey", "").isEmpty()) 
-        {
-            currentAPIKey = preferences.getString("APIkey", "");
-        }
-    preferences.end();
-    */
     
     Serial.println("[webServer] Starting the server...");
     server.begin();
@@ -81,27 +66,86 @@ void setupAPMaster()
         String html = "<html><head><title>Gateway Configuration</title>";
         html += "<style>";
         html += "body { font-size: 140%; text-align: center; background-color: #f0f0ff; color: #800080; }";
-        html += "form { text-align: left; max-width: 400px; margin: 0 auto; }";
-        html += "label { display: block; margin-bottom: 10px; }";
-        html += "input { width: 100%; box-sizing: border-box; padding: 5px; margin-bottom: 15px; }";
-        html += "input[type='checkbox'] { width: auto; margin-left: 5px; }";
-        html += "input[type='submit'] { background-color: #800080; color: #fff; padding: 8px 15px; border: none; cursor: pointer; }";
+        html += "form { text-align: left; max-width: 600px; margin: 0 auto; }";  // Aumentando a largura máxima e centralizando
+        html += "label { display: block; margin-bottom: 15px; float: left; width: 40%; }";  // Aumentando o espaçamento entre os labels e os outros elementos
+        html += "input[type='checkbox'] { width: auto; margin-left: 5px; float: left; clear: right; }";  // Flutuando a checkbox para a esquerda e limpando o flutuador à direita
+        html += "input[type='submit'] { background-color: #800080; color: #fff; padding: 10px 15px; border: none; cursor: pointer; margin-top: 20px; }";  // Aumentando o padding do botão e adicionando margem superior
+        html += "select, input[type='text'], input[type='password'], input[type='number'] { width: 60%; box-sizing: border-box; padding: 10px; margin-bottom: 20px; float: right; }";  // Aumentando o espaçamento vertical entre os elementos
+        html += "select { margin-bottom: 20px; }";  // Ajustando a margem inferior das selects
+        html += "div { clear: both; }";  // Limpando os flutuadores após os inputs
         html += "</style>";
         html += "</head><body>";
         html += "<h1 style='color: #800080;'>Gateway Configuration Settings</h1>";
         html += "<form action='/config' method='POST'>";
-        html += "<label for='ssid'>Network name:</label> <input type='text' name='ssid'><br>";
-        html += "Empty password? <input type='checkbox' name='noPassword'><br>";
-        html += "<label for='password'>Network password:</label> <input type='password' name='password'><br>";
-        html += "<label for='url'>URL API Server:</label> <input type='text' name='url'><br>";
-        html += "<label for='APIkey'>Password Key:</label> <input type='password' name='APIKey'>"; 
-        html += "<input type='submit' value='Send'>";
+        html += "<div><label for='ssid'>Network name:</label> <input type='text' name='ssid'></div>";  // Div para agrupar o label e o input
+        html += "<div>Empty password? <input type='checkbox' name='noPassword'></div>";
+        html += "<div><label for='password'>Network password:</label> <input type='password' name='password'></div>";
+        html += "<div><label for='url'>URL API Server:</label> <input type='text' name='url'></div>";
+        html += "<div><label for='APIkey'>Password Key:</label> <input type='password' name='APIKey'></div>"; 
+        
+        // Adicionando opções de configuração LoRa como listas suspensas
+        html += "<div>Configuration mode? <input type='checkbox' name='enableConfig'></div>";
+        
+        // Lista suspensa para a largura de banda (bandwidth)
+        html += "<div><label for='bandwidth'>Bandwidth:</label>";
+        html += "<select name='bandwidth'>";
+        html += "<option value='0'>7.8 kHz</option>";
+        html += "<option value='1'>10.4 kHz</option>";
+        html += "<option value='2'>15.6 kHz</option>";
+        html += "<option value='3'>20.8 kHz</option>";
+        html += "<option value='4'>31.25 kHz</option>";
+        html += "<option value='5'>41.7 kHz</option>";
+        html += "<option value='6'>62.5 kHz</option>";
+        html += "<option value='7'>125 kHz</option>";
+        html += "<option value='8'>250 kHz</option>";
+        html += "<option value='9'>500 kHz</option>";
+        html += "</select></div>";
+        
+        // Lista suspensa para a taxa de codificação (coding rate)
+        html += "<div><label for='codingRate'>Coding Rate:</label>";
+        html += "<select name='codingRate'>";
+        html += "<option value='0'>5</option>";
+        html += "<option value='1'>6</option>";
+        html += "<option value='2'>7</option>";
+        html += "<option value='3'>8</option>";
+        html += "</select></div>";
+        
+        // Lista suspensa para o fator de espalhamento (spreading factor)
+        html += "<div><label for='spreadingFactor'>Spreading Factor:</label>";
+        html += "<select name='spreadingFactor'>";
+        html += "<option value='6'>SF6</option>";
+        html += "<option value='7'>SF7</option>";
+        html += "<option value='8'>SF8</option>";
+        html += "<option value='9'>SF9</option>";
+        html += "<option value='10'>SF10</option>";
+        html += "<option value='11'>SF11</option>";
+        html += "<option value='12'>SF12</option>";
+        html += "</select></div>";
+        
+        // Lista suspensa para a potência de transmissão (tx power)
+        html += "<div><label for='txPower'>Tx Power:</label>";
+        html += "<select name='txPower'>";
+        html += "<option value='0'>20 dBm</option>";
+        html += "<option value='1'>17 dBm</option>";
+        html += "<option value='2'>14 dBm</option>";
+        html += "<option value='3'>11 dBm</option>";
+        html += "<option value='4'>8 dBm</option>";
+        html += "<option value='5'>5 dBm</option>";
+        html += "<option value='6'>2 dBm</option>";
+        html += "</select></div>";
+        
+        // Checkbox para habilitar PA_BOOST
+        html += "<div>Enable PA_BOOST? <input type='checkbox' name='enablePABOOST'></div>";
+        
+        // Botão de envio centralizado
+        html += "<div style='text-align: center;'><input type='submit' value='Send'></div>";
+        
+        // Você pode adicionar mais opções aqui conforme necessário
         html += "</form>";
         html += "</body></html>";
 
         request->send(200, "text/html", html);
     });
-
 
     server.on("/config", HTTP_POST, [](AsyncWebServerRequest *request) 
     {
@@ -137,6 +181,7 @@ void setupAPMaster()
         // Desconecte completamente o wifi
         Serial.println("[webServer] Restarting the wifi handler...");
         WiFi.disconnect();
+        wifiConn->connect();
     });
 
     // Chama a função uma vez no início para obter os IDs dos nodes
@@ -153,7 +198,7 @@ void setupAPMaster()
     }
 }
 
-void setupAPSlave()
+void setupAPResponder()
 {
     int apCount = WiFi.scanNetworks();
     int suffix = 1;
@@ -212,4 +257,31 @@ std::vector<String> scanAndCreateNodeIDs()
   }
 
   return nodeIDs;
+}
+
+bool setupPreferences()
+{
+  preferences.begin("configuracoes", false);
+      if(!preferences.begin("configuracoes", false))
+      {
+        return false;
+      }
+      if(!preferences.getString("ssid", "").isEmpty()) 
+      {
+          currentSSID = preferences.getString("ssid", "");
+      }
+      if(!preferences.getString("password", "").isEmpty()) 
+      {
+          currentPassword = preferences.getString("password", "");
+      }
+      if(!preferences.getString("url", "").isEmpty()) 
+      {
+          currentURL = preferences.getString("url", "");
+      }
+      if(!preferences.getString("APIKey", "").isEmpty()) 
+      {
+          currentAPIKey = preferences.getString("APIkey", "");
+      }
+  preferences.end();
+  return true;
 }

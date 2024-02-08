@@ -1,4 +1,4 @@
-#include "internetStuff.h"
+#include "wificonn.h"
 
 WiFiConn::WiFiConn(String ssid, String password)
 {

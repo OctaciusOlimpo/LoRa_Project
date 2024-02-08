@@ -1,4 +1,4 @@
-#include "master.h"
+#include "controller.h"
 
 //Intervalo entre os envios
 #define INTERVAL 1000
@@ -22,29 +22,27 @@ int idDisplay;
 void reconectarMQTT();
 void enviarDadosMQTT(String, String, String, String);
 
-WiFiConn* wifiConn;
+WiFiConn* wifiConn = new WiFiConn(currentSSID, currentPassword);
 
-void setupMaster()
+void setupController()
 {
   //Chama a configuração inicial do display
   setupDisplay();
   //Chama a configuração inicial do LoRa
-  setupLoRa();
+  loraConn->connect();
   //Chama a configuração do servidor web
-  setupAPMaster();
+  setupAPController();
 
   display.clear();
-  display.drawString(0, 0, "Master");
+  display.drawString(0, 0, "Controller");
   display.display();
-
-  wifiConn = new WiFiConn(currentSSID, currentPassword);
 
   wifiConn->connect();
 
   // Configurar o servidor MQTT
   clientPubSub.setServer(mqtt_server, mqtt_port);
 
-  Serial.print("[master] Number of Slaves: ");
+  Serial.print("[master] Number of Responders: ");
   Serial.println(numNodes);
 
   while(true)
@@ -78,7 +76,7 @@ void setupMaster()
   }
 }
 
-void loopMaster()
+void loopController()
 {
   vTaskDelete(NULL);
 }
@@ -131,7 +129,7 @@ void receive()
       String humidityRef = data.substring(pos2 + 1, pos3);
       String rssiRef = data.substring(pos3 + 1, data.length());
 
-      Serial.println("[master] ID" + String(id) + " " + readingID);
+      Serial.println("[controller] ID" + String(id) + " " + readingID);
       if(("ID" + String(id)) == readingID)
       { 
         // sendToAPI(readingID, temperatureRef, humidityRef);  
@@ -143,7 +141,7 @@ void receive()
           display.clear();
           // Calcula a posição com base no índice
           int displayOffset = idDisplay * 10; // ou qualquer valor apropriado de acordo com o espaçamento desejado
-          display.drawString(0, displayOffset, "Recebeu: " + data);
+          display.drawString(0, displayOffset, "Rx: " + data);
           display.display();
         }
         else
@@ -154,7 +152,7 @@ void receive()
         
         idDisplay++;
         //                 C  L
-        display.drawString(0, 50, "Tempo: " + waiting + "ms");
+        display.drawString(0, 50, "Time: " + waiting + "ms");
         display.display();
       }
     }
@@ -203,16 +201,16 @@ void reconectarMQTT()
 {
   while (!clientPubSub.connected()) 
   {
-    Serial.println("[master] Conectando ao servidor MQTT...");
+    Serial.println("[controller] Connecting to MQTT server...");
     if (clientPubSub.connect("ESP32Client", mqtt_user, mqtt_password)) 
     {
-      Serial.println("[master] Conectado ao servidor MQTT");
+      Serial.println("[controller] Connected to MQTT server");
     } 
     else 
     {
-      Serial.print("[master] Falha na conexão, rc=");
+      Serial.print("[controller] Connection fail, rc=");
       Serial.println(clientPubSub.state());
-      Serial.println("[master] Tentando novamente em 5 segundos...");
+      Serial.println("[controller] Trying again in 5 seconds...");
       delay(5000);
     }
   }
