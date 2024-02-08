@@ -1,4 +1,4 @@
-#include "slave.h"
+#include "responder.h"
 
 String humidity = "";
 String temperature = "";
@@ -14,15 +14,15 @@ String nodeID;
 
 DHTesp dht;
 
-void setupSlave()
+void setupResponder()
 {
   //Chama a configuração inicial do display
   setupDisplay();
   //Chama a configuração inicial do LoRa
-  setupLoRa();
+  loraConn->connect();
   display.clear();
-  Serial.println("[slave] Slave esperando...");
-  display.drawString(0, 0, "Slave esperando...");
+  Serial.println("[responder] Responder waiting...");
+  display.drawString(0, 0, "Responder waiting...");
   display.display();
 
   dht.setup(21, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
@@ -37,7 +37,7 @@ void setupSlave()
   }
 }
 
-void loopSlave()
+void loopResponder()
 {
   //Tenta ler o pacote
   int packetSize = LoRa.parsePacket();
@@ -52,14 +52,14 @@ void loopSlave()
       received += (char) LoRa.read();
     }
 
-    Serial.print("[slave] "); Serial.println(received);
+    Serial.print("[responder] "); Serial.println(received);
 
     if(received == nodeID)
     {
       //Simula a leitura dos dados
       readData();
       String data = nodeID + "/" + temperature + "&" + humidity + "&" + rssi;
-      Serial.println("[slave] Criando pacote para envio");
+      Serial.println("[responder] Creating package for shipping");
       //Cria o pacote para envio
       LoRa.beginPacket();
       LoRa.print(SETDATA + data);
@@ -67,8 +67,8 @@ void loopSlave()
       LoRa.endPacket();
       //Mostra no display
       display.clear();
-      Serial.println("[slave] Enviou: " + String(data) + " " + currentID + " " + nodeID);
-      display.drawString(0, 0, "Enviou: " + String(data));
+      Serial.println("[responder] Sent: " + String(data) + " " + currentID + " " + nodeID);
+      display.drawString(0, 0, "Sent: " + String(data));
       display.display();
     }
   }
