@@ -8,5 +8,6 @@
 void setupResponder();
 void loopResponder();
 void readData();
+void configurableLoRa();
 
 #endif //RESPONDER_H

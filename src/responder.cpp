@@ -56,20 +56,45 @@ void loopResponder()
 
     if(received == nodeID)
     {
-      //Simula a leitura dos dados
+      //Faz a leitura dos dados
       readData();
-      String data = nodeID + "/" + temperature + "&" + humidity + "&" + rssi;
-      Serial.println("[responder] Creating package for shipping");
+      String data = nodeID + "/" + temperature + "&" + humidity + "&" + String(LoRa.packetRssi());
+      Serial.println("[responder] Creating sensor data package for sending");
+      
       //Cria o pacote para envio
       LoRa.beginPacket();
       LoRa.print(SETDATA + data);
-      //Finaliza e envia o pacote
+      
       LoRa.endPacket();
+      //Finaliza e envia o pacote
+
       //Mostra no display
       display.clear();
-      Serial.println("[responder] Sent: " + String(data) + " " + currentID + " " + nodeID);
+      Serial.println("[responder] Sent: " + String(data) + ".");
       display.drawString(0, 0, "Sent: " + String(data));
       display.display();
+    }
+    else if(received.indexOf("CF") != -1)
+    {
+
+      String data = received.substring(String("CF").length());
+
+      int pos1 = data.indexOf('&');
+      int pos2 = data.indexOf('&', pos1 + 1);
+      int pos3 = data.indexOf('&', pos2 + 1);
+      int pos4 = data.indexOf('&', pos3 + 1);
+      int pos5 = data.indexOf('&', pos4 + 1);
+
+      String bandwidthRef = data.substring(0, pos1);
+      String codingRateRef = data.substring(pos1 + 1, pos2);
+      String spreadingFactorRef = data.substring(pos2 + 1, pos3);
+      String txPowerRef = data.substring(pos3 + 1, pos4);
+      String enablePABOOSTRef = data.substring(pos4 + 1, data.length());
+
+      Serial.println("[responder] LoRa Data: " + bandwidthRef + " " + codingRateRef + " "+ spreadingFactorRef + " " + txPowerRef + " " + enablePABOOSTRef);
+      Serial.println("[responder] LoRa going to change!");
+
+      loraConn->reconnect(bandwidthRef.toInt(), codingRateRef.toInt(), spreadingFactorRef.toInt(), txPowerRef.toInt(), enablePABOOSTRef.toInt());
     }
   }
 }
@@ -127,3 +152,7 @@ void readData()
   rssi = String(averageRssi);
 }
 
+void configurableLoRa()
+{
+
+}

@@ -36,14 +36,13 @@ int currentBandwidth;
 int currentCodingRate;
 int currentSpreadingFactor;
 int currentTxPower;
-bool currentEnablePABOOST;
+bool currentEnablePaboost;
 
 int numNodes;
 
 std::vector<String> nodeIDs;
 
 AsyncWebServer server(80);
-// WiFiClient client;
 
 void setupAPController()
 {
@@ -89,10 +88,10 @@ void setupAPController()
         // Lista suspensa para a largura de banda (bandwidth)
         html += "<div><label for='bandwidth'>Bandwidth:</label>";
         html += "<select name='bandwidth'>";
-        html += "<option value='0'>7.8 kHz</option>";
-        html += "<option value='1'>10.4 kHz</option>";
-        html += "<option value='2'>15.6 kHz</option>";
-        html += "<option value='3'>20.8 kHz</option>";
+        //html += "<option value='0'>7.8 kHz</option>";
+        //html += "<option value='1'>10.4 kHz</option>";
+        //html += "<option value='2'>15.6 kHz</option>";
+        //html += "<option value='3'>20.8 kHz</option>";
         html += "<option value='4'>31.25 kHz</option>";
         html += "<option value='5'>41.7 kHz</option>";
         html += "<option value='6'>62.5 kHz</option>";
@@ -113,13 +112,13 @@ void setupAPController()
         // Lista suspensa para o fator de espalhamento (spreading factor)
         html += "<div><label for='spreadingFactor'>Spreading Factor:</label>";
         html += "<select name='spreadingFactor'>";
-        html += "<option value='6'>SF6</option>";
-        html += "<option value='7'>SF7</option>";
-        html += "<option value='8'>SF8</option>";
-        html += "<option value='9'>SF9</option>";
-        html += "<option value='10'>SF10</option>";
-        html += "<option value='11'>SF11</option>";
-        html += "<option value='12'>SF12</option>";
+        //html += "<option value='0'>SF6</option>";
+        html += "<option value='1'>SF7</option>";
+        html += "<option value='2'>SF8</option>";
+        html += "<option value='3'>SF9</option>";
+        html += "<option value='4'>SF10</option>";
+        html += "<option value='5'>SF11</option>";
+        html += "<option value='6'>SF12</option>";
         html += "</select></div>";
         
         // Lista suspensa para a potência de transmissão (tx power)
@@ -154,25 +153,67 @@ void setupAPController()
         {
             currentSSID = request->getParam("ssid", true)->value();
             preferences.putString("ssid", currentSSID);
-            Serial.println("[servidorWeb] Nova SSID: " + currentSSID);
+            Serial.println("[servidorWeb] New SSID: " + currentSSID);
         }
-        if((request->hasParam("password", true) && !(request->getParam("password", true)->value().isEmpty())) || (request->hasParam("noPassword", true) == true)) 
+        if((request->hasParam("password", true) && !(request->getParam("password", true)->value().isEmpty())) || request->hasParam("noPassword", true)) 
         {
             currentPassword = request->getParam("password", true)->value();
             preferences.putString("password", currentPassword);
-            Serial.println("[servidorWeb] Nova password: " + currentPassword);
+            Serial.println("[servidorWeb] New password: " + currentPassword);
         }
-        if(request->hasParam("url", true)) 
+
+        // Verifica se a opção "Configuration Mode" está selecionada
+        currentEnableConfig = request->hasParam("enableConfig", true) && request->getParam("enableConfig", true)->value() == "on";
+        
+        if(request->hasParam("url", true) && currentEnableConfig) 
         {
             currentURL = request->getParam("url", true)->value();
             preferences.putString("url", currentURL);
-            Serial.println("[servidorWeb] Novo URL: " + currentURL);
+            Serial.println("[servidorWeb] New URL: " + currentURL);
         }
-        if(request->hasParam("passwordServ", true)) 
+        if(request->hasParam("passwordServ", true) && currentEnableConfig) 
         {
             currentAPIKey = request->getParam("APIKey", true)->value();
             preferences.putString("APIKey", currentAPIKey);
-            Serial.println("[servidorWeb] Nova senha servidor: " + currentAPIKey);
+            Serial.println("[servidorWeb] New password servidor: " + currentAPIKey);
+        }
+
+        // Verifica se a opção "Configuration Mode" está selecionada
+        currentEnablePaboost = request->hasParam("enablePABOOST", true) && request->getParam("enablePABOOST", true)->value() == "on";
+
+        if(currentEnableConfig)
+        {
+          // Percorre todos os parâmetros da requisição
+          for (size_t i = 0; i < request->params(); i++) 
+          {
+              AsyncWebParameter* p = request->getParam(i);
+              if (p->name() == "bandwidth") 
+              {
+                  // Converte o valor da largura de banda para int
+                  currentBandwidth = p->value().toInt();
+              } 
+              else if (p->name() == "codingRate") 
+              {
+                  // Converte o valor da taxa de codificação para int
+                  currentCodingRate = p->value().toInt();
+              } 
+              else if (p->name() == "spreadingFactor") 
+              {
+                  // Converte o valor do fator de espalhamento para int
+                  currentSpreadingFactor = p->value().toInt();
+              } 
+              else if (p->name() == "txPower") 
+              {
+                  // Converte o valor da potência de transmissão para int
+                  currentTxPower = p->value().toInt();
+              }
+              // Adicione mais condições conforme necessário para outros parâmetros
+          }
+
+          Serial.print("[servidorWeb] Current Bandwidth: "); Serial.println(currentBandwidth);
+          Serial.print("[servidorWeb] Current Coding Rate: "); Serial.println(currentCodingRate);
+          Serial.print("[servidorWeb] Current Spreading Factor: "); Serial.println(currentSpreadingFactor);
+          Serial.print("[servidorWeb] Current Tx Power: "); Serial.println(currentTxPower);
         }
 
         preferences.end();

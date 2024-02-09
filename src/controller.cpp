@@ -60,16 +60,22 @@ void setupController()
       //Marcamos o tempo que ocorreu o último envio
       lastSendTime = millis();
       //Envia o pacote para informar ao Slave que queremos receber os dados
-      send();
+      
+      if(!currentEnableConfig)
+      {
+        send();
+      }
+      else
+      {
+        loraConfigurable();
+        currentEnableConfig = false;
+
+        loraConn->reconnect(currentBandwidth, currentCodingRate, currentSpreadingFactor, currentTxPower, currentEnablePaboost);
+      }
     }
 
     // Lidar com eventos MQTT
     clientPubSub.loop();
-
-    // internetController.pubsubLoop();
-
-    // // Adicione um pequeno atraso para dar um respiro ao sistema
-    // delay(100);
 
     //Verificamos se há pacotes para recebermos
     receive();
@@ -236,4 +242,20 @@ void enviarDadosMQTT(String idRef, String temperaturaRef, String umidadeRef, Str
 
   // Mova para o próximo escravo usando circular
   id = (id + 1) % numNodes;
+}
+
+void loraConfigurable()
+{
+  //Inicializa o pacote
+    LoRa.beginPacket();
+
+    Serial.println("[master] Creating package for LoRa changing");
+    String data = "CF";
+    data += String(currentBandwidth) + "&" + String(currentCodingRate) + "&"; 
+    data += String(currentSpreadingFactor) + "&" + String(currentTxPower) + "&" + String(currentEnablePaboost);
+    
+    //Envia o que está contido em "data"
+    LoRa.print(data);
+    //Finaliza e envia o pacote
+    LoRa.endPacket();
 }
