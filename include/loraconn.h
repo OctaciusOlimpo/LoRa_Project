@@ -29,4 +29,5 @@ class LoRaConn
         LoRaConn();
         
         void connect();
+        void reconnect(int bandwidthRef, int codingRateRef, int spreadingFactorRef, int txPowerRef, int enablePabootsRef);
 };

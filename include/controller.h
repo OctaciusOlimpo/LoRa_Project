@@ -7,12 +7,14 @@
 #include "main.h"
 #include "wificonn.h"
 #include "loraconn.h"
+#include "webserver.h"
 
 void setupController();
 void loopController();
 void send();
 void receive();
 void sendToAPI(String, String, String);
+void loraConfigurable();
 
 extern String loraMessage;
 extern String readingID;
