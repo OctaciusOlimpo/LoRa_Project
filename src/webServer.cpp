@@ -46,6 +46,10 @@ AsyncWebServer server(80);
 
 void setupAPController()
 {
+
+    // // Obtenha a instância única da classe WiFiConn
+    // WiFiConn& wifi = WiFiConn::getInstance(currentSSID, currentPassword);
+
     Serial.println("[webServer] Configuring AP Mode (Access Point)...");
     WiFi.softAP(currentID.c_str(), password);
     
@@ -75,6 +79,9 @@ void setupAPController()
         html += "</style>";
         html += "</head><body>";
         html += "<h1 style='color: #800080;'>Gateway Configuration Settings</h1>";
+        
+        html += "<p>Wi-Fi status: " + WiFiConn::getInstance().connectionToString[WiFiConn::getInstance().connected.wifi] + ".</p>";
+        
         html += "<form action='/config' method='POST'>";
         html += "<div><label for='ssid'>Network name:</label> <input type='text' name='ssid'></div>";  // Div para agrupar o label e o input
         html += "<div>Empty password? <input type='checkbox' name='noPassword'></div>";
@@ -221,8 +228,10 @@ void setupAPController()
 
         // Desconecte completamente o wifi
         Serial.println("[webServer] Restarting the wifi handler...");
+        
         WiFi.disconnect();
-        wifiConn->connect();
+        WiFiConn::getInstance().updateCredentials(currentSSID, currentPassword); // Wifi local;
+
     });
 
     // Chama a função uma vez no início para obter os IDs dos nodes

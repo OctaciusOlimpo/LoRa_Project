@@ -15,7 +15,7 @@ void LoRaConn::connect()
   {
     //Se não conseguiu inicializar, mostra uma mensagem no display
     // display.clear();
-    Serial.println("[main] Error initializing LoRa!");
+    Serial.println("[loraconn] Error initializing LoRa!");
     // display.drawString(0, 0, "Error initializing LoRa!");
     // display.display();
     while (1);

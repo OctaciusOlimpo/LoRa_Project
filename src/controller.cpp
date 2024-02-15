@@ -22,8 +22,6 @@ int idDisplay;
 void reconectarMQTT();
 void enviarDadosMQTT(String, String, String, String);
 
-WiFiConn* wifiConn = new WiFiConn(currentSSID, currentPassword);
-
 void setupController()
 {
   //Chama a configuração inicial do display
@@ -37,8 +35,12 @@ void setupController()
   display.drawString(0, 0, "Controller");
   display.display();
 
-  wifiConn->connect();
+  // Declaração global da instância da classe WiFiConn
+  WiFiConn& wifi = WiFiConn::getInstance(currentSSID, currentPassword);
 
+  while(!wifi.wifiConnected());
+
+  // delay(5000);
   // Configurar o servidor MQTT
   clientPubSub.setServer(mqtt_server, mqtt_port);
 
@@ -48,9 +50,8 @@ void setupController()
   while(true)
   {
     // Reconectar ao servidor MQTT se necessário
-    if (!clientPubSub.connected()) //internetController.pubsubConnected() 
+    if (!clientPubSub.connected() && wifi.wifiConnected()) 
     {
-      // internetController.reconectarMQTT();
       reconectarMQTT();
     }
 

@@ -483,6 +483,7 @@
             "defines": [
                 "PLATFORMIO=60113",
                 "ARDUINO_HELTEC_WIFI_LORA_32_V2",
+                "CONTROLLER",
                 "HAVE_CONFIG_H",
                 "MBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
                 "UNITY_INCLUDE_CONFIG_H",
