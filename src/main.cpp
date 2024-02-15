@@ -32,7 +32,6 @@ void setup()
     setupController();
   #else
     // Configuração inicial do Slave
-    setupAPResponder();
     setupResponder();
   #endif
 }

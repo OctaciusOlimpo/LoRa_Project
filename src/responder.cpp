@@ -16,10 +16,15 @@ DHTesp dht;
 
 void setupResponder()
 {
+  //Chama a configuração inicial do Web Server
+  setupAPResponder();
+ 
   //Chama a configuração inicial do display
   setupDisplay();
+ 
   //Chama a configuração inicial do LoRa
   loraConn->connect();
+  
   display.clear();
   Serial.println("[responder] Responder waiting...");
   display.drawString(0, 0, "Responder waiting...");
@@ -150,9 +155,4 @@ void readData()
   humidity = String(averageHumidity);
   temperature = String(averageTemperature);
   rssi = String(averageRssi);
-}
-
-void configurableLoRa()
-{
-
 }

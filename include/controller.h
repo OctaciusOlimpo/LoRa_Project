@@ -18,6 +18,5 @@ void loraConfigurable();
 
 extern String loraMessage;
 extern String readingID;
-extern WiFiConn* wifiConn;
 
 #endif //CONTROLLER_H
