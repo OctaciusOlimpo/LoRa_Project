@@ -4,6 +4,8 @@
 #include <SPI.h>
 #include <Wire.h>
 
+#include "wificonn.h"
+
 #define SCK     5  // GPIO5  SCK
 #define MISO    19 // GPIO19 MISO
 #define MOSI    27 // GPIO27 MOSI

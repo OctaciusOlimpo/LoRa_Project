@@ -5,7 +5,7 @@ WiFiConn::WiFiConn(String ssid, String password)
     this->ssid = ssid;
     this->password = password;
     
-    Serial.println("[wificonn] Constructor wificonn started!");
+    //Serial.println("[wificonn] Constructor wificonn started!");
     Serial.print("[wificonn] Connecting to ");
     Serial.println(ssid);
     WiFi.begin(ssid, password);
@@ -15,12 +15,17 @@ WiFiConn::WiFiConn(String ssid, String password)
     connectionToString[DISCONNECTED] = "Disconnected";
     connectionToString[CONNECTED] = "Connected";
     
-    // Crie uma tarefa para lidar com a conexão Wi-Fi
+    esp_wifi_set_ps(WIFI_PS_NONE);
+
+    //Create a task to handle the Wi-Fi connection
     xTaskCreatePinnedToCore(controllerDispatcher, "WifiTask", 7300, NULL, 1, NULL, 0); //controllerDispatcher
 }
 
 void WiFiConn::controller()
 {
+    esp_task_wdt_init(120, true); //120 seconds, panic mode = true, reset entire esp
+    esp_task_wdt_add(NULL);
+
     connection state = DISCONNECTED;
 
     while(1)
@@ -39,20 +44,25 @@ void WiFiConn::controller()
                     vTaskDelay(5000/portTICK_PERIOD_MS);
                     Serial.print(".");
                 }
+                
                 Serial.println("");
-                Serial.println("[wifitask] WiFi connected.");
-                Serial.print("[wifitask] IP address: "); Serial.println(WiFi.localIP());
+                Serial.println("[wificonn] WiFi connected.");
+                Serial.print("[wificonn] IP address: "); Serial.println(WiFi.localIP());
                 state = CONNECTED;
             break;
 
             case CONNECTED:
                 xQueueSend(wifiStatusQueue, (void *) &state, 0);
+                
+                esp_task_wdt_reset();
+                
                 vTaskDelay(500 / portTICK_PERIOD_MS);
                 
                 if(this->ssid != WiFi.SSID() || this->password != WiFi.psk())
                 {
-                    Serial.println("[wifitask] SSID ou senha alterados. Reiniciando conexão...");
-                    // Reinicia a conexão Wi-Fi com os novos parâmetros
+                    Serial.println("[wificonn] SSID ou senha alterados. Reiniciando conexão...");
+                    
+                    //Restarts the Wi-Fi connection with the new parameters
                     WiFi.disconnect(true);
                     WiFi.begin(this->ssid, this->password);
                     state = DISCONNECTED;
@@ -65,7 +75,8 @@ void WiFiConn::controller()
             break;
         }
 
-        // monitorTaskStack(); 
+        //Uncomment to inform task size
+        //monitorTaskStack(); 
     }
 }
 
@@ -95,16 +106,16 @@ void WiFiConn::updateCredentials(String ssid, String password)
 
 void monitorTaskStack() 
 {
-  // Obtenha o uso de memória da stack da task
+  //Get the memory usage of the task stack
   uint32_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
 
-  // Converta de palavras para bytes
+  //Convert from words to bytes
   uint32_t stackHighWaterMarkBytes = stackHighWaterMark * sizeof(StackType_t);
 
-  // Imprima o uso de memória da stack na porta serial
+  //Print stack memory usage on the serial port
   Serial.print("Stack High Watermark (bytes): ");
   Serial.println(stackHighWaterMarkBytes);
 
-  // Aguarde um tempo antes de verificar novamente (opcional)
+  //Wait a while before checking again (optional)
   delay(1000);
 }

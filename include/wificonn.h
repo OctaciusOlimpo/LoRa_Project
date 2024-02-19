@@ -2,6 +2,9 @@
 
 #include <WiFi.h>
 #include <map>
+#include <esp_log.h>
+#include <esp_task_wdt.h>
+#include <esp_wifi.h>
 
 void monitorTaskStack();
 

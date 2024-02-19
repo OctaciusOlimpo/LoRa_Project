@@ -7,6 +7,7 @@
 #include <ESPAsyncWebServer.h>
 #include <Preferences.h>
 
+#include "images.h"
 #include "webserver.h"
 #include "controller.h"
 #include "responder.h"
