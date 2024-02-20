@@ -2,7 +2,7 @@
 
 #include "main.h"
 
-// Variáveis globais webserver
+//Webserver global variables.
 extern String currentSSID;
 extern String currentPassword;
 extern String currentURL;
@@ -20,10 +20,13 @@ extern int numNodes;
 extern int nodeNumber;
 
 extern std::vector<String> nodeIDs;
-// Fim das variáveis globais webserver
+//End of webserver global variables.
 
-// Protótipo funções webserver
+//Prototype webserver functions.
 void setupAPController();
 void setupAPResponder();
+bool setupPreferences();
+bool setupAP();
+
 std::vector<String> scanAndCreateNodeIDs();
-//Fim protótipo das funções 
+//End prototype of functions.

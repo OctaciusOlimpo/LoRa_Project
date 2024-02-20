@@ -16,19 +16,24 @@ DHTesp dht;
 
 void setupResponder()
 {
-  //Chama a configuração inicial do display
+  //Calls the initial Web Server configuration.
+  setupAPResponder();
+ 
+  //Calls the initial display configuration.
   setupDisplay();
-  //Chama a configuração inicial do LoRa
+ 
+  //Call initial LoRa configuration.
   loraConn->connect();
+  
   display.clear();
   Serial.println("[responder] Responder waiting...");
   display.drawString(0, 0, "Responder waiting...");
   display.display();
 
-  dht.setup(21, DHTesp::DHT11); // Connect DHT sensor to GPIO 0
+  dht.setup(21, DHTesp::DHT11); //Connect DHT sensor to GPIO 21.
   nodeID = "ID"+ String(currentID.substring(4).toInt());
 
-  // Inicializa os arrays com um valor que representa uma amostra não coletada
+  //Initializes arrays with a value that represents an uncollected sample.
   for (int i = 0; i < NUM_SAMPLES; i++) 
   {
     humiditySamples[i] = -1;
@@ -39,39 +44,46 @@ void setupResponder()
 
 void loopResponder()
 {
-  //Tenta ler o pacote
+  //Try to read the package.
   int packetSize = LoRa.parsePacket();
-  //Verifica se o pacote possui a quantidade de caracteres que esperamos
+  
+  //Checks if the package has the number of characters we expect.
   if (packetSize > 0)
   {
     String received = "";
 
-    //Armazena os dados do pacote em uma string
+    //Stores package data in a string.
     while(LoRa.available())
     {
       received += (char) LoRa.read();
     }
 
-    Serial.print("[responder] "); Serial.println(received);
+    Serial.print("[responder] "); Serial.println(received + ".");
 
     if(received == nodeID)
     {
-      //Faz a leitura dos dados
+      //Read the data.
       readData();
-      String data = nodeID + "/" + temperature + "&" + humidity + "&" + String(LoRa.packetRssi());
-      Serial.println("[responder] Creating sensor data package for sending");
+      String data = nodeID + "/" + temperature + "&" + humidity + "&" + rssi;
+      Serial.println("[responder] Creating sensor data package for sending.");
       
-      //Cria o pacote para envio
+      //Create the package for shipping.
       LoRa.beginPacket();
       LoRa.print(SETDATA + data);
       
       LoRa.endPacket();
-      //Finaliza e envia o pacote
+      //Finalize and send the package.
 
-      //Mostra no display
+      //Shows on display.
       display.clear();
       Serial.println("[responder] Sent: " + String(data) + ".");
-      display.drawString(0, 0, "Sent: " + String(data));
+      
+      display.drawString(0, 0, "NODE: " + nodeID + ".");
+      
+      display.drawString(0, 10, "Sent: " + String(data) + ".");
+      display.drawString(0, 20, "Temperature: " + String(temperature) + "°C.");
+      display.drawString(0, 30, "Humidity: " + String(humidity) + "%.");
+      display.drawString(0, 40, "RSSI: " + String(rssi) + "dBm.");
       display.display();
     }
     else if(received.indexOf("CF") != -1)
@@ -99,27 +111,25 @@ void loopResponder()
   }
 }
 
-//Função onde se faz a leitura dos dados que queira enviar
-//Poderia ser o valor lido por algum sensor por exemplo
-//Aqui vamos enviar apenas um contador para testes
-//mas você pode alterar a função para fazer a leitura de algum sensor
+//Function where the data you want to send is read.
+//It could be the value read by a sensor, for example.
 void readData() 
 {
-  // Realiza a leitura dos dados do sensor DHT11
+  //Reads data from the DHT11 sensor.
   delay(dht.getMinimumSamplingPeriod());
   float currentHumidity = dht.getHumidity();
   float currentTemperature = dht.getTemperature();
   float currentRssi = LoRa.packetRssi();
 
-  // Atualiza os arrays de amostras
+  //Update sample arrays.
   humiditySamples[sampleIndex] = currentHumidity;
   temperatureSamples[sampleIndex] = currentTemperature;
   rssiSamples[sampleIndex] = currentRssi;
 
-  // Avança para o próximo índice de amostra circular
+  //Advance to the next circular sample index.
   sampleIndex = (sampleIndex + 1) % NUM_SAMPLES;
 
-  // Calcula a média móvel
+  //Calculates the moving average.
   float averageHumidity = 0;
   float averageTemperature = 0;
   float averageRssi = 0;
@@ -128,9 +138,9 @@ void readData()
 
   for (int i = 0; i < NUM_SAMPLES; i++) 
   {
-    // Soma apenas as amostras válidas
+    //Sums only valid samples.
     if (humiditySamples[i] != -1) 
-    {  // Supondo que -1 seja um valor de inicialização para indicar uma amostra não válida
+    { //Assuming -1 is an initialization value to indicate an invalid sample.
       averageHumidity += humiditySamples[i];
       averageTemperature += temperatureSamples[i];
       averageRssi += rssiSamples[i];
@@ -140,19 +150,14 @@ void readData()
   }
 
   if (count > 0) 
-  {  // Evita divisão por zero
+  { //Avoid division by zero.
     averageHumidity /= count;
     averageTemperature /= count;
     averageRssi /= count;
   }
 
-  // Atualiza as variáveis globais (pode ser modificado conforme sua necessidade)
+  //Updates global variables (can be modified as needed).
   humidity = String(averageHumidity);
   temperature = String(averageTemperature);
   rssi = String(averageRssi);
-}
-
-void configurableLoRa()
-{
-
 }

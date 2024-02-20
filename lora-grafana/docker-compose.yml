@@ -12,6 +12,7 @@ services:
       DOCKER_INFLUXDB_INIT_ORG: lora
       DOCKER_INFLUXDB_INIT_BUCKET: lora
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: 383502ea-9354-49f6-81b5-ce9c072e9676
+
   grafana:
     image: grafana/grafana
     volumes:
@@ -19,7 +20,33 @@ services:
     ports:
       - 3000:3000
 
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+    volumes:
+      - ./mosquitto_conf/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto_conf/passwd:/mosquitto/config/passwd
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  python-client:
+    build:
+      context: .
+      dockerfile: clientmqtt.dockerfile
+    depends_on:
+      - mosquitto
+      - influx
+    networks:                 
+      - lora-grafana_default
+
+networks:
+  lora-grafana_default:  
+    external: true
 
 volumes:
   influx: {}
   grafana: {}
+  mosquitto: {}
+  mosquitto_data: {}
+  mosquitto_log: {}

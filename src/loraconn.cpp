@@ -1,40 +1,45 @@
 #include "loraconn.h"
 
-//Configurações iniciais do LoRa
+//LoRa initial settings.
 LoRaConn::LoRaConn()
 { 
-  //Inicializa a comunicação
+  //Initializes communication.
   SPI.begin(SCK, MISO, MOSI, SS);
   LoRa.setPins(SS, RST, DI00);
 }
 
 void LoRaConn::connect()
 {
-  //Inicializa o LoRa
+  //Initialize LoRa.
   if (!LoRa.begin(BAND))
   {
-    //Se não conseguiu inicializar, mostra uma mensagem no display
-    // display.clear();
-    Serial.println("[main] Error initializing LoRa!");
-    // display.drawString(0, 0, "Error initializing LoRa!");
-    // display.display();
-    while (1);
+    Serial.println("[loraconn] Error initializing LoRa!");
+    //while (1){}
+
+    Serial.println("[loraconn] Resetting ESP32 in 5 seconds!");
+    delay(5000);
+    esp_restart();
   }
 
-  //Ativa o crc
+  //Activate crc.
   LoRa.enableCrc();
-  //Ativa o recebimento de pacotes
+  
+  //Activates packet reception.
   LoRa.receive();
 }
 
 void LoRaConn::reconnect(int bandwidthRef, int codingRateRef, int spreadingFactorRef, int txPowerRef, int enablePaboostRef)
 {
-  //Inicializa o LoRa
+  //Initialize LoRa again with the new settings.
   if (!LoRa.begin(BAND))
   {
-    //Se não conseguiu inicializar, mostra uma mensagem no display
-    Serial.println("[loraconn] Erro ao inicializar o LoRa!");
-    while (1){};
+    //If it was unable to initialize, a message will appear on the serial monitor.
+    Serial.println("[loraconn] Error initializing LoRa!");
+    //while (1){}
+
+    Serial.println("[loraconn] Resetting ESP32 in 5 seconds!");
+    delay(5000);
+    esp_restart();
   }
   
   LoRa.setSignalBandwidth(bandwidthOptions[bandwidthRef]);
@@ -42,8 +47,8 @@ void LoRaConn::reconnect(int bandwidthRef, int codingRateRef, int spreadingFacto
   LoRa.setSpreadingFactor(spreadingFactorOptions[spreadingFactorRef]);
   LoRa.setTxPower(txPowerOptions[txPowerRef], paBoostOptions[enablePaboostRef]);
 
-  Serial.println("[loraconn] Alterado com Sucesso!");
+  Serial.println("[loraconn] Changed successfully!");
 
-  //Ativa o crc
+  //Activate crc.
   LoRa.enableCrc();
 }
