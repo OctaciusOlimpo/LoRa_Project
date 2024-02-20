@@ -1,16 +1,16 @@
 #include "loraconn.h"
 
-//LoRa initial settings
+//LoRa initial settings.
 LoRaConn::LoRaConn()
 { 
-  //Initializes communication
+  //Initializes communication.
   SPI.begin(SCK, MISO, MOSI, SS);
   LoRa.setPins(SS, RST, DI00);
 }
 
 void LoRaConn::connect()
 {
-  //Initialize LoRa
+  //Initialize LoRa.
   if (!LoRa.begin(BAND))
   {
     Serial.println("[loraconn] Error initializing LoRa!");
@@ -21,19 +21,19 @@ void LoRaConn::connect()
     esp_restart();
   }
 
-  //Activate crc
+  //Activate crc.
   LoRa.enableCrc();
   
-  //Activates packet reception
+  //Activates packet reception.
   LoRa.receive();
 }
 
 void LoRaConn::reconnect(int bandwidthRef, int codingRateRef, int spreadingFactorRef, int txPowerRef, int enablePaboostRef)
 {
-  //Initialize LoRa again with the new settings
+  //Initialize LoRa again with the new settings.
   if (!LoRa.begin(BAND))
   {
-    //If it was unable to initialize, a message will appear on the serial monitor
+    //If it was unable to initialize, a message will appear on the serial monitor.
     Serial.println("[loraconn] Error initializing LoRa!");
     //while (1){}
 
@@ -49,6 +49,6 @@ void LoRaConn::reconnect(int bandwidthRef, int codingRateRef, int spreadingFacto
 
   Serial.println("[loraconn] Changed successfully!");
 
-  //Activate crc
+  //Activate crc.
   LoRa.enableCrc();
 }

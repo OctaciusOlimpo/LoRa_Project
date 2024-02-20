@@ -17,13 +17,13 @@ WiFiConn::WiFiConn(String ssid, String password)
     
     esp_wifi_set_ps(WIFI_PS_NONE);
 
-    //Create a task to handle the Wi-Fi connection
-    xTaskCreatePinnedToCore(controllerDispatcher, "WifiTask", 7300, NULL, 1, NULL, 0); //controllerDispatcher
+    //Create a task to handle the Wi-Fi connection.
+    xTaskCreatePinnedToCore(controllerDispatcher, "WifiTask", 7300, NULL, 1, NULL, 0);
 }
 
 void WiFiConn::controller()
 {
-    esp_task_wdt_init(120, true); //120 seconds, panic mode = true, reset entire esp
+    esp_task_wdt_init(120, true); //120 seconds, panic mode = true, reset entire esp.
     esp_task_wdt_add(NULL);
 
     connection state = DISCONNECTED;
@@ -35,7 +35,7 @@ void WiFiConn::controller()
         switch(state)
         {
             case DISCONNECTED:
-                Serial.println("[wifitask] Connecting to WiFi...");
+                Serial.println("[wificonn] Connecting to WiFi...");
                 
                 xQueueSend(wifiStatusQueue, (void *) &state, 0);
 
@@ -62,7 +62,7 @@ void WiFiConn::controller()
                 {
                     Serial.println("[wificonn] SSID ou senha alterados. Reiniciando conexão...");
                     
-                    //Restarts the Wi-Fi connection with the new parameters
+                    //Restarts the Wi-Fi connection with the new parameters.
                     WiFi.disconnect(true);
                     WiFi.begin(this->ssid, this->password);
                     state = DISCONNECTED;
@@ -75,7 +75,7 @@ void WiFiConn::controller()
             break;
         }
 
-        //Uncomment to inform task size
+        //Uncomment to inform task size.
         //monitorTaskStack(); 
     }
 }
@@ -106,16 +106,16 @@ void WiFiConn::updateCredentials(String ssid, String password)
 
 void monitorTaskStack() 
 {
-  //Get the memory usage of the task stack
+  //Get the memory usage of the task stack.
   uint32_t stackHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
 
-  //Convert from words to bytes
+  //Convert from words to bytes.
   uint32_t stackHighWaterMarkBytes = stackHighWaterMark * sizeof(StackType_t);
 
-  //Print stack memory usage on the serial port
+  //Print stack memory usage on the serial port.
   Serial.print("Stack High Watermark (bytes): ");
   Serial.println(stackHighWaterMarkBytes);
 
-  //Wait a while before checking again (optional)
+  //Wait a while before checking again (optional).
   delay(1000);
 }

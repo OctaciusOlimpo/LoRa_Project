@@ -19,4 +19,4 @@ void loraConfigurable();
 extern String loraMessage;
 extern String readingID;
 
-#endif //CONTROLLER_H
+#endif //CONTROLLER_H.

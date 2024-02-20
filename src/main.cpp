@@ -13,18 +13,18 @@ void logo()
 
 void setupDisplay()
 {
-  //The state of GPIO16 is used to control the OLED display
+  //The state of GPIO16 is used to control the OLED display.
   pinMode(16, OUTPUT);
   
-  //Resets OLED display settings
+  //Resets OLED display settings.
   digitalWrite(16, LOW);
   
   //For the OLED to remain on, GPIO16 must remain HIGH
   //It must be HIGH before calling display.init() and making other settings,
-  //do not reverse the order
+  //do not reverse the order.
   digitalWrite(16, HIGH);
 
-  //Display Settings
+  //Display Settings.
   display.init();
   //display.setContrast(255, 241, 64);
   display.flipScreenVertically();
@@ -42,10 +42,10 @@ void setup()
   Serial.begin(115200);
 
   #ifdef CONTROLLER
-    //Initial Master Setup
+    //Initial "Controller" Setup.
     setupController();
   #else
-    //Initial Slave Configuration
+    //Initial "Responder" Configuration.
     setupResponder();
   #endif
 }
@@ -53,10 +53,10 @@ void setup()
 void loop()
 {
   #ifdef CONTROLLER
-    //Main Master Loop
+    //Main "Controller" loop.
     loopController();
   #else
-    //Slave main loop
+    //"Responder" main loop.
     loopResponder();
   #endif
 }

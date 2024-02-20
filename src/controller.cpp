@@ -1,23 +1,23 @@
 #include "controller.h"
 
-//Interval between sending
+//Interval between sending.
 #define INTERVAL 1000
 #define MAX_DISPLAY_LINES 4
 
-//MQTT Broker information
+//MQTT Broker information.
 const char* mqtt_server = "192.168.0.176";
 const int mqtt_port = 1883;
 const char* mqtt_user = "esp32-gateway-1";
 const char* mqtt_password = "wonder";
 
-//Client to HTTP Post
+//Client to HTTP Post.
 WiFiClient clientHttp;
 
-//Client to MQTT Pub Sub
+//Client to MQTT Pub Sub.
 WiFiClient clientMqtt;
 PubSubClient clientPubSub(clientMqtt);
 
-//Last sending time
+//Last sending time.
 long lastSendTime = 0;
 int id = 0;
 
@@ -28,45 +28,45 @@ void enviarDadosMQTT(String, String, String, String);
 
 void setupController()
 {
-  //Calls the initial display configuration
+  //Calls the initial display configuration.
   setupDisplay();
   
-  //Calls initial LoRa configuration
+  //Calls initial LoRa configuration.
   loraConn->connect();
   
-  //Calls web server configuration
+  //Calls web server configuration.
   setupAPController();
 
   display.clear();
-  display.drawString(0, 0, "Controller");
+  display.drawString(0, 0, "Controller waiting...");
   display.display();
 
-  //Global declaration of the WiFiConn class instance
+  //Global declaration of the WiFiConn class instance.
   WiFiConn& wifi = WiFiConn::getInstance(currentSSID, currentPassword);
 
   while(!wifi.wifiConnected()){}
 
-  //MQTT server settings
+  //MQTT server settings.
   clientPubSub.setServer(mqtt_server, mqtt_port);
 
-  Serial.print("[master] Number of Responders: ");
+  Serial.print("[controller] Number of Responders: ");
   Serial.println(numNodes);
 
   while(true)
   {
-    //Reconnect to MQTT server if necessary
+    //Reconnect to MQTT server if necessary.
     if (!clientPubSub.connected() && wifi.wifiConnected()) 
     {
       reconectarMQTT();
     }
 
-    //If the time defined in INTERVAL has passed since the last sending
+    //If the time defined in INTERVAL has passed since the last sending...
     if (millis() - lastSendTime > INTERVAL)
     {
-      //We mark the time when the last sending occurred
+      //We mark the time when the last sending occurred!
       lastSendTime = millis();
       
-      //Send the packet to inform the Slave that we want to receive the data
+      //And send the packet to inform the "responder" that we want to receive the data.
       if(!currentEnableConfig)
       {
         send();
@@ -80,10 +80,10 @@ void setupController()
       }
     }
 
-    //Handle MQTT events
+    //Handle MQTT events.
     clientPubSub.loop();
 
-    //We check if there are packages for us to receive
+    //We check if there are packages for us to receive.
     receive();
   }
 }
@@ -95,46 +95,46 @@ void loopController()
 
 void send()
 {
-  //Initialize the package
+  //Initialize the package.
   LoRa.beginPacket();
   
-  //Sends what is contained in "nodeIDs"
+  //Sends what is contained in "nodeIDs".
   LoRa.print(nodeIDs[id]);
   
-  //Finalize and send the package
+  //Finalize and send the package.
   LoRa.endPacket();
 }
 
 void receive()
 {
-  //We try to read the package
+  //We try to read the package.
   int packetSize = LoRa.parsePacket();
 
-  //We check that the packet has the minimum character size we expect
+  //We check that the packet has the minimum character size we expect.
   if (packetSize > SETDATA.length())
   {
     String received = "";
     
-    //Stores package data in a string
+    //Stores package data in a string.
     while(LoRa.available())
     {
       received += (char) LoRa.read();
     }
     
-    //Checks if the string has what is contained in "SETDATA"
+    //Checks if the string has what is contained in "SETDATA".
     int index = received.indexOf(SETDATA);
     if(index >= 0)
     {
       //We retrieve the string after "SETDATA",
-      //which in this case will be the data of interest to us
+      //which in this case will be the data of interest to us.
       String data = received.substring(SETDATA.length());
       
-      //Time it took for the Master to create the package, send the package,
-      //the Slave receives, reads, creates a new packet, sends it
-      //and the Master receives and reads
+      //Time it took for the "controller" to create the package, send the package,
+      //the "responder" receives, reads, creates a new packet, sends it
+      //and the "controller" receives and reads.
       String waiting = String(millis() - lastSendTime);
       
-      //Shows on the display the data and the time the operation took
+      //Shows on the display the data and the time the operation took.
       //display.clear();
       
       int pos1 = data.indexOf('/');   
@@ -146,38 +146,45 @@ void receive()
       String humidityRef = data.substring(pos2 + 1, pos3);
       String rssiRef = data.substring(pos3 + 1, data.length());
 
-      Serial.println("[controller] ID" + String(id) + " " + readingID);
+      //Serial.println("[controller] ID match: ID" + String(id) + " = " + readingID + "?");
+      
       if(("ID" + String(id)) == readingID)
       { 
-        //Send data via HTTP POST
+        //Serial.println("[controller] Yes!");
+
+        //Send data via HTTP POST.
         sendToAPI(readingID, temperatureRef, humidityRef);  
        
-        //Send data via MQTT
+        //Send data via MQTT.
         enviarDadosMQTT(readingID, temperatureRef, humidityRef, rssiRef);
 
         if(idDisplay <= MAX_DISPLAY_LINES)
         {
           display.clear();
           
-          //Calculates position based on index
-          int displayOffset = idDisplay * 10; // ou qualquer valor apropriado de acordo com o espaçamento desejado
+          //Calculates position based on index...
+          int displayOffset = idDisplay * 10; //...or any appropriate value as per desired spacing.
           display.drawString(0, displayOffset, "Rx: " + data);
           display.display();
         }
         else
         {
-          //If it reaches the limit, it returns to the first line
+          //If it reaches the limit, it returns to the first line.
           idDisplay = 0;
         }
         
         idDisplay++;
         
-        //First number refers to colum and second number refers to line 
-        display.drawString(0, 50, "Time: " + waiting + "ms");
+        //Note: First number refers to colum and second number refers to line. 
+        display.drawString(0, 50, "Time: " + waiting + "ms.");
         display.display();
       
-        //Move to next slave using circular
+        //Move to next slave using circular index.
         id = (id + 1) % numNodes;
+      }
+      else
+      {
+        //Serial.println("[controller] No!");
       }
     }
   }    
@@ -185,20 +192,20 @@ void receive()
 
 void sendToAPI(String idAP, String temperatureAP, String humidityAP)
 {
-  //Convert String to const char*
+  //Convert String to const char*.
   const char* host = currentURL.c_str();
 
-  if (clientHttp.connect(host, 80)) //"184.106.153.149" or api.thingspeak.com
+  if (clientHttp.connect(host, 80)) //"184.106.153.149" or api.thingspeak.com.
   {
     String postStr = currentAPIKey;
   
-    Serial.print("[master] "); Serial.print(idAP); 
-    Serial.print(" "); Serial.print(temperatureAP); Serial.print(" "); Serial.print(humidityAP); 
-    Serial.println(); 
+    //Serial.print("[master] "); Serial.print(idAP); 
+    //Serial.print(" "); Serial.print(temperatureAP); Serial.print(" "); Serial.print(humidityAP); 
+    //Serial.println(); 
 
     postStr += "&field" + String((id+1)*2 - 1) + "=";
-    Serial.print("[master] Indice AP "); Serial.print(String((id+1)*2 - 2)); 
-    Serial.print(" "); Serial.println(String((id+1)*2 - 1)); 
+    //Serial.print("[master] Indice AP "); Serial.print(String((id+1)*2 - 2)); 
+    //Serial.print(" "); Serial.println(String((id+1)*2 - 1)); 
     postStr += String(temperatureAP);
     postStr += "&field" + String((id+2)*2 - 2) + "=";
     postStr += String(humidityAP);
@@ -215,7 +222,7 @@ void sendToAPI(String idAP, String temperatureAP, String humidityAP)
     clientHttp.print("\n\n");
     clientHttp.print(postStr);
 
-    //Move to next slave using circular
+    //Move to next slave using circular index.
     //id = (id + 1) % numNodes;
   }    
 }
@@ -225,54 +232,56 @@ void reconectarMQTT()
   while (!clientPubSub.connected()) 
   {
     Serial.println("[controller] Connecting to MQTT server...");
+
     if (clientPubSub.connect("ESP32Client", mqtt_user, mqtt_password)) 
     {
-      Serial.println("[controller] Connected to MQTT server");
+      Serial.println("[controller] Connected to MQTT server.");
     } 
     else 
     {
       Serial.print("[controller] Connection fail, rc=");
       Serial.println(clientPubSub.state());
       Serial.println("[controller] Trying again in 5 seconds...");
-      delay(5000);
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
+      //delay(5000);
     }
   }
 }
 
 void enviarDadosMQTT(String idRef, String temperaturaRef, String umidadeRef, String rssiRef) 
 {
-  //Create a JSON object
-  JsonDocument doc; //Set the size as needed
+  //Create a JSON object.
+  JsonDocument doc; //Set the size as needed.
   
-  //Add the values ​​to the JSON object
+  //Add the values ​​to the JSON object.
   doc["id"] = idRef;
-  doc["temperature"] = temperaturaRef.toFloat(); //Convert to float
-  doc["humidity"] = umidadeRef.toFloat(); //Convert to float
-  doc["rssi"] = rssiRef.toFloat(); //Convert to float
+  doc["temperature"] = temperaturaRef.toFloat(); //Convert to float.
+  doc["humidity"] = umidadeRef.toFloat(); //Convert to float.
+  doc["rssi"] = rssiRef.toFloat(); //Convert to float.
 
-  //Serialize JSON object into a string
+  //Serialize JSON object into a string.
   String mensagem;
   serializeJson(doc, mensagem);
 
-  //Publish the MQTT message
+  //Publish the MQTT message.
   clientPubSub.publish("teste", mensagem.c_str());
 
-  //Move to next slave using circular
+  //Move to next slave using circular index.
   //id = (id + 1) % numNodes;
 }
 
 void loraConfigurable()
 {
-  //Initialize the package
+  //Initialize the package.
   LoRa.beginPacket();
 
-  Serial.println("[master] Creating package for LoRa changing");
+  Serial.println("[master] Creating package for LoRa changing.");
   String data = "CF";
   data += String(currentBandwidth) + "&" + String(currentCodingRate) + "&"; 
   data += String(currentSpreadingFactor) + "&" + String(currentTxPower) + "&" + String(currentEnablePaboost);
   
-  //Sends what is contained in "data"
+  //Sends what is contained in "data".
   LoRa.print(data);
-  //Finalize and send the package
+  //Finalize and send the package.
   LoRa.endPacket();
 }

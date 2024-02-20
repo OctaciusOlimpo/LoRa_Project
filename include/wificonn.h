@@ -14,12 +14,12 @@ class WiFiConn
         String ssid;
         String password;
 
-        //Construtor da classe 
+        //Class constructor.
         WiFiConn(String ssid, String password);
 
         void controller(void);
 
-        //Método estático para despachar a conexão
+        //Static method to dispatch the connection.
         static void controllerDispatcher(void * params) 
         {
             WiFiConn& instance = getInstance();
@@ -30,13 +30,13 @@ class WiFiConn
 
     public:
 
-        // Método estático para obter a instância única da classe
+        //Static method to get single instance of class.
         static WiFiConn& getInstance(String ssid = "", String password = "") 
         {
-            // Garante que apenas uma instância será criada
+            //Ensures that only one instance will be created.
             static WiFiConn instance(ssid, password);
 
-            // Atualiza o SSID e a senha se forem fornecidos
+            //Updates SSID and password if provided.
             if (ssid != "" && password != "") 
             {
                 instance.ssid = ssid;
@@ -46,7 +46,7 @@ class WiFiConn
             return instance;
         }
         
-        // Método para atualizar SSID e senha
+        //Method to update SSID and password.
         void updateCredentials(String ssid, String password);
 
         bool wifiConnected();
