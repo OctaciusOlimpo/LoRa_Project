@@ -80,7 +80,7 @@ void loopResponder()
       
       display.drawString(0, 0, "NODE: " + nodeID + ".");
       
-      display.drawString(0, 10, "Sent: " + String(data) + ".");
+      //display.drawString(0, 10, "Sent: " + String(data) + ".");
       display.drawString(0, 20, "Temperature: " + String(temperature) + "°C.");
       display.drawString(0, 30, "Humidity: " + String(humidity) + "%.");
       display.drawString(0, 40, "RSSI: " + String(rssi) + "dBm.");
@@ -105,6 +105,16 @@ void loopResponder()
 
       Serial.println("[responder] LoRa Data: " + bandwidthRef + " " + codingRateRef + " "+ spreadingFactorRef + " " + txPowerRef + " " + enablePABOOSTRef);
       Serial.println("[responder] LoRa going to change!");
+
+      //Create the package for shipping.
+      // LoRa.beginPacket();
+      // LoRa.print(nodeID + "received");
+      
+      // LoRa.endPacket();
+      //Finalize and send the package.
+
+      // display.drawString(0, 10, "LoRa: "  + bandwidthRef + " " + codingRateRef + " "+ spreadingFactorRef + " " + txPowerRef + " " + enablePABOOSTRef);
+      // display.display();
 
       loraConn->reconnect(bandwidthRef.toInt(), codingRateRef.toInt(), spreadingFactorRef.toInt(), txPowerRef.toInt(), enablePABOOSTRef.toInt());
     }

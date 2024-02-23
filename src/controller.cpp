@@ -23,6 +23,9 @@ int id = 0;
 
 int idDisplay;
 
+float sumTemp;
+float sumHumi;
+
 void reconectarMQTT();
 void enviarDadosMQTT(String, String, String, String);
 
@@ -76,6 +79,8 @@ void setupController()
         loraConfigurable();
         currentEnableConfig = false;
 
+        //while(loraConfirm){receive();}
+
         loraConn->reconnect(currentBandwidth, currentCodingRate, currentSpreadingFactor, currentTxPower, currentEnablePaboost);
       }
     }
@@ -100,6 +105,8 @@ void send()
   
   //Sends what is contained in "nodeIDs".
   LoRa.print(nodeIDs[id]);
+
+  Serial.println("enviado: " + nodeIDs[id]);
   
   //Finalize and send the package.
   LoRa.endPacket();
@@ -121,6 +128,8 @@ void receive()
       received += (char) LoRa.read();
     }
     
+    Serial.println("recebido: " + received);
+
     //Checks if the string has what is contained in "SETDATA".
     int index = received.indexOf(SETDATA);
     if(index >= 0)
@@ -152,11 +161,36 @@ void receive()
       { 
         //Serial.println("[controller] Yes!");
 
-        //Send data via HTTP POST.
-        sendToAPI(readingID, temperatureRef, humidityRef);  
-       
-        //Send data via MQTT.
-        enviarDadosMQTT(readingID, temperatureRef, humidityRef, rssiRef);
+        sumTemp += temperatureRef.toFloat();
+        sumHumi += humidityRef.toFloat();
+
+        if(readingID == ("ID" + String(numNodes-1)))
+        {
+          //Send data via HTTP POST.
+          //sendToAPI(readingID, temperatureRef, humidityRef);  
+        
+          //Send data via MQTT.
+          enviarDadosMQTT(readingID, temperatureRef, humidityRef, rssiRef);
+
+          vTaskDelay(100 / portTICK_PERIOD_MS);
+
+          float mediaTemp = sumTemp / numNodes;
+          float mediaHumi = sumHumi / numNodes; 
+          
+          //Send data via MQTT.
+          enviarDadosMQTT("default", String(mediaTemp), String(mediaHumi), " ");
+
+          sumTemp = 0;
+          sumHumi = 0;
+        }
+        else
+        {
+          //Send data via HTTP POST.
+          //sendToAPI(readingID, temperatureRef, humidityRef);  
+        
+          //Send data via MQTT.
+          enviarDadosMQTT(readingID, temperatureRef, humidityRef, rssiRef);
+        }
 
         if(idDisplay <= MAX_DISPLAY_LINES)
         {
@@ -176,7 +210,7 @@ void receive()
         idDisplay++;
         
         //Note: First number refers to colum and second number refers to line. 
-        display.drawString(0, 50, "Time: " + waiting + "ms.");
+        //display.drawString(0, 50, "Time: " + waiting + "ms.");
         display.display();
       
         //Move to next slave using circular index.
@@ -284,4 +318,8 @@ void loraConfigurable()
   LoRa.print(data);
   //Finalize and send the package.
   LoRa.endPacket();
+
+  display.drawString(0, 50, "LoRa: "  + String(currentBandwidth) + " " + String(currentCodingRate) + " "+ String(currentSpreadingFactor) + " " + String(currentTxPower) + " " + String(currentEnablePaboost));
+  display.display();
+
 }
