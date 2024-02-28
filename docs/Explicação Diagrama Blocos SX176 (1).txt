@@ -1,0 +1,23 @@
+ O diagrama de blocos enviado é de um chip transceiver LoRa SX1276/77/78/79. Aqui está uma descrição detalhada do diagrama:
+
+- O diagrama começa com entradas para RF (Radio Frequency) em baixa e alta frequência, indicadas como RF_LF e RF_HF. Existem amplificadores para cada entrada, marcados como PA_LF e PA_HF, respectivamente. 
+
+- A energia é regulada por um regulador de PA (Amplificador de Potência).
+
+- Há duas PLLs (Phase-Locked Loops), uma para banda alta e outra para banda baixa, indicadas pelas cores azul e amarelo, e um misturador (MUX) que seleciona entre as saídas PLLs.
+
+- O sinal então é processado por dois ADCs (Conversores Analógico-Digital), seguidos por demoduladores para LoRa e FSK/OOK (Frequency Shift Keying / On-Off Keying). 
+
+- O sinal passa por um buffer de dados LoRa e um FIFO (First-In, First-Out) para FSK/OOK.
+
+- Os registros de configuração e a interface SPI (Serial Peripheral Interface) são utilizados para configuração e comunicação com o chip.
+
+- Há um oscilador de cristal e um oscilador RC para a geração de frequência. 
+
+- A distribuição de energia é indicada no diagrama, com várias entradas para diferentes partes do circuito. 
+
+- No canto direito inferior, há um controle com pinos para terra (GND), reset (NRESET) e outros controles de interface (NSS, MISO, MOSI, SCK, DIO[0-5]).
+
+- No topo direito, há uma indicação para a interface com a antena. 
+
+Este chip é  um componente de hardware utilizado para comunicação de longo alcance com baixo consumo de energia, típico em aplicações de Internet das Coisas (IoT). 
