@@ -4,7 +4,7 @@
   <img width="200" src="images/LoRa_Logo.png" alt="LoRa Logo">
 </p>
 
-radiofrequência LoRa (Long Range). O projeto envolve a implementação de um esquema estrela, no qual os elementos "gateway" - chamados de "receivers" no escopo do projeto - e os "end-devices" - chamados de "responders" no escopo do projeto - colaboram para coletar dados de sensores e encaminhá-los para um local host em HTTP Post - por intermédio da plataforma online da Thingspeak - ou MQTT.
+Este repositório é dedicado ao desenvolvimento de uma rede IoT para sensoriamento, utilizando comunicação por radiofrequência LoRa (Long Range). O projeto envolve a implementação de um esquema estrela, no qual os elementos "gateway" - chamados de "receivers" no escopo do projeto - e os "end-devices" - chamados de "responders" no escopo do projeto - colaboram para coletar dados de sensores e encaminhá-los para um local host em HTTP Post - por intermédio da plataforma online da Thingspeak - ou MQTT.
 
 ## Arquitetura da Rede
 
