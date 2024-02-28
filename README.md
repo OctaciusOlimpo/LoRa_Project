@@ -1,4 +1,4 @@
-# Projeto de Desenvolvimento de Rede IoT com LoRa
+# Implementação de um sistema de sensoriamento embarcado com LoRa.
 
 <p align="center">
   <img width="200" src="images/LoRa_Logo.png" alt="LoRa Logo">
