@@ -46,7 +46,7 @@ Na pasta:
 
 - `/lora-grafana`: Desenvolvimento do empacotamento Docker.
 
-Existe o arquivo docker-compose para a geração de um conteiner com quatro camadas que concentra desde o servidor MQTT, quanto o banco de dados InfluxDB e a dashboard Grafana. Leia o README desse diretório para maiores informações. 
+Existe o arquivo `docker-compose` para a geração de um conteiner com quatro camadas que concentra desde o servidor MQTT, quanto o banco de dados InfluxDB e a dashboard Grafana. Leia o README desse diretório para maiores informações. 
 
 ## Estrutura do Repositório
 
