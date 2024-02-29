@@ -72,7 +72,7 @@ Existe o arquivo docker-compose para a geração de um conteiner com quatro cama
 ## Contribuição
 
 <p align="center">
-  <img width="200" src="images/The_Team.png" alt="O time">
+  <img width="200" src="images/The_Team.jpeg" alt="O time">
 </p>
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, propor melhorias ou enviar pull requests.
