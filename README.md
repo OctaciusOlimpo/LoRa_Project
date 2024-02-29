@@ -46,7 +46,7 @@ Na pasta:
 
 - `/lora-grafana`: Desenvolvimento do empacotamento Docker.
 
-Existe o arquivo docker-compose para a geração de um conteiner com quatro camadas que concentra desde o servidor MQTT, quanto o banco de dados InfluxDB e a dashboard Grafana.
+Existe o arquivo docker-compose para a geração de um conteiner com quatro camadas que concentra desde o servidor MQTT, quanto o banco de dados InfluxDB e a dashboard Grafana. Leia o README desse diretório para maiores informações. 
 
 ## Estrutura do Repositório
 
@@ -63,10 +63,18 @@ Existe o arquivo docker-compose para a geração de um conteiner com quatro cama
    ```bash
    git clone https://github.com/OctaciusOlimpo/LoRa_Project.git
 
-2. Siga as instruções específicas para configurar e instalar o firmware nos end-devices e no gateway no diretório /src.
-3. Consulte a documentação no diretório /docs para obter informações detalhadas sobre a configuração e operação da rede.
+2. Para configurar e instalar o firmware nos end-devices e no gateway é necessário ora comentar ora descomentar a macro `-CONTROLLER` em `platformio.ini`.
+
+3. Para configurar a rede, basta alterar a rede do local host em `webserver.cpp`. 
+
+4. Consulte a documentação no diretório /docs para obter maiores informações sobre a configuração e operação da rede.
 
 ## Contribuição
+
+<p align="center">
+  <img width="200" src="images/The_Team.png" alt="O time">
+</p>
+
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, propor melhorias ou enviar pull requests.
 
 ## Licença
