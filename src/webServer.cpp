@@ -159,15 +159,15 @@ void setupAPController()
       preferences.begin("configuracoes", false);
       if(request->hasParam("ssid", true) && !(request->getParam("ssid", true)->value().isEmpty())) 
       {
-          currentSSID = request->getParam("ssid", true)->value();
-          preferences.putString("ssid", currentSSID);
-          Serial.println("[servidorWeb] New SSID: " + currentSSID);
+          // currentSSID = request->getParam("ssid", true)->value();
+          // preferences.putString("ssid", currentSSID);
+          // Serial.println("[servidorWeb] New SSID: " + currentSSID);
       }
       if((request->hasParam("password", true) && !(request->getParam("password", true)->value().isEmpty())) || request->hasParam("noPassword", true)) 
       {
-          currentPassword = request->getParam("password", true)->value();
-          preferences.putString("password", currentPassword);
-          Serial.println("[servidorWeb] New password: " + currentPassword);
+          // currentPassword = request->getParam("password", true)->value();
+          // preferences.putString("password", currentPassword);
+          // Serial.println("[servidorWeb] New password: " + currentPassword);
       }
 
       //Check if the "Configuration Mode" option is selected.
@@ -186,7 +186,7 @@ void setupAPController()
           Serial.println("[servidorWeb] New password servidor: " + currentAPIKey);
       }
 
-      ////Check if the "Configuration Mode" option is selected.
+      //Check if the "Configuration Mode" option is selected.
       //currentEnablePaboost = request->hasParam("enablePABOOST", true) && request->getParam("enablePABOOST", true)->value() == "on";
 
       if(currentEnableConfig)
@@ -226,7 +226,7 @@ void setupAPController()
 
       preferences.end();
       request->redirect("/");
-
+      
       Serial.println("[webServer] Restarting the wifi handler...");
       
       WiFi.disconnect();
@@ -318,11 +318,12 @@ bool setupPreferences()
   }
   if(!preferences.getString("ssid", "").isEmpty()) 
   {
-    currentSSID = preferences.getString("ssid", "");
+    //currentSSID = preferences.getString("ssid", "");
+    //Serial.println("Sendo sobrescrito");
   }
   if(!preferences.getString("password", "").isEmpty()) 
   {
-    currentPassword = preferences.getString("password", "");
+    //currentPassword = preferences.getString("password", "");
   }
   //if(!preferences.getString("url", "").isEmpty()) 
   //{

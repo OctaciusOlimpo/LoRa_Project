@@ -33,7 +33,7 @@ services:
   python-client:
     build:
       context: .
-      dockerfile: clientmqtt.dockerfile
+      dockerfile: client-mqtt.dockerfile
     depends_on:
       - mosquitto
       - influx

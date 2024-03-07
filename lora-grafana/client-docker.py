@@ -1,5 +1,6 @@
 import random
 import json
+
 import datetime as dt
 from paho.mqtt import client as mqtt_client
 import influxdb_client
@@ -25,10 +26,10 @@ db_write = db.write_api(write_options=SYNCHRONOUS)
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe(TOPIC)
-    print("Conectado ao broker MQTT")
+    print("Connected to broker")
 
 def on_disconnect(client, userdata, flags):
-    print("Desconectado do broker MQTT")
+    print("Disconnected to broker")
 
 def on_message(client, userdata, msg):
     try:
@@ -73,15 +74,9 @@ def run():
     broker.on_disconnect = on_disconnect
     broker.on_message = on_message
 
-    try:
-        broker.connect(BROKER_HOST, BROKER_PORT)
-        print("Conectado ao broker MQTT")
-    except ConnectionRefusedError as cre:
-        print("Erro de conexão:", cre)
-    except Exception as e:
-        print("Erro ao conectar:", e)
-
+    broker.connect(BROKER_HOST, BROKER_PORT)
     broker.loop_forever()
+
 
 if __name__ == '__main__':
     run()

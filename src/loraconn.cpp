@@ -21,6 +21,11 @@ void LoRaConn::connect()
     esp_restart();
   }
 
+  //LoRa.setSignalBandwidth(bandwidthOptions[4]);
+  //LoRa.setCodingRate4(codingRateOptions[0]);
+  //LoRa.setSpreadingFactor(spreadingFactorOptions[0]);
+  //LoRa.setTxPower(txPowerOptions[0], paBoostOptions[1]);
+
   //Activate crc.
   LoRa.enableCrc();
   
